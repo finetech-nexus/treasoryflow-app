@@ -149,22 +149,21 @@
         <section class="page on" id="pilotage">
           <div class="page-head">
             <div class="kicker" data-i18n="dash.kicker">Tableau de bord</div>
-            <h1 data-i18n="dash.title">BIAT et le scénario du jour</h1>
+            <h1 data-i18n="dash.title">Nexus Bank</h1>
             <p class="lead" id="disclaimer"></p>
           </div>
           <div class="stats" id="kpis"></div>
-          <h2 data-i18n="dash.publishedTitle">États consolidés publiés</h2>
-          <p class="note" data-i18n="dash.publishedLead">Chiffres publics de la BIAT au 31 décembre 2025, en dinars. Ils n'alimentent pas le ratio de liquidité.</p>
-          <div class="stats" id="published-kpis"></div>
           <div class="cards" id="entity-cards"></div>
-          <div id="pilot-table"></div>
+          <h2 data-i18n="dash.banksTitle">Place bancaire tunisienne</h2>
+          <p class="note" data-i18n="dash.banksLead">Les 23 banques de la liste du ministère des Finances. Identité publique seulement : aucun solde n'est chargé.</p>
+          <div id="banks-table"></div>
         </section>
 
         <section class="page" id="positions">
           <div class="page-head">
             <div class="kicker" data-i18n="pos.kicker">Positions</div>
             <h1 data-i18n="pos.title">Soldes par nature</h1>
-            <p class="lead" data-i18n="pos.lead">Les soldes comptabilisés viennent du core. Le scénario de calcul est distinct des états publiés.</p>
+            <p class="lead" data-i18n="pos.lead">Les soldes comptabilisés viennent du core de Nexus Bank.</p>
           </div>
           <div id="positions-table"></div>
         </section>
@@ -177,7 +176,7 @@
           </div>
           <form class="panel" id="deal-form">
             <div class="row">
-              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId"><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option><option value="TN-BANK" data-i18n="entity.tn">BIAT</option></select></label>
+              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId"><option value="EU-BANK" data-i18n="entity.eu">Nexus Bank — Europe</option><option value="TN-BANK" data-i18n="entity.tn">Nexus Bank</option></select></label>
               <label><span data-i18n="lbl.product">Produit</span><select name="productCode"><option>FX_SPOT</option><option>FX_FORWARD</option><option>FX_SWAP</option><option>IB_PLACE</option><option>IB_BORROW</option><option>REPO</option><option>REVERSE_REPO</option></select></label>
               <label><span data-i18n="lbl.currency">Devise</span><input name="currency" value="EUR" maxlength="3" /></label>
               <label><span data-i18n="lbl.amount">Montant</span><input name="amount" value="1000.00" /></label>
@@ -196,7 +195,7 @@
             <h1 data-i18n="fc.title">Projection et gaps ALM</h1>
           </div>
           <div class="toolbar">
-            <label><span data-i18n="lbl.entity">Entité</span><select id="forecast-entity"><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option><option value="TN-BANK" data-i18n="entity.tn">BIAT</option></select></label>
+            <label><span data-i18n="lbl.entity">Entité</span><select id="forecast-entity"><option value="EU-BANK" data-i18n="entity.eu">Nexus Bank — Europe</option><option value="TN-BANK" data-i18n="entity.tn">Nexus Bank</option></select></label>
             <label><span data-i18n="lbl.scenario">Scénario</span><select id="forecast-scenario"><option>BASE</option><option>STRESS_DELAY</option><option>STRESS_FUNDING</option></select></label>
             <button class="btn primary" id="project-btn" type="button" data-i18n="btn.project">Projeter</button>
           </div>
@@ -248,7 +247,7 @@
           <h2 data-i18n="int.route">Routage</h2>
           <form class="panel" id="route-form">
             <div class="row">
-              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId"><option value="TN-BANK" data-i18n="entity.tn">BIAT</option><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option></select></label>
+              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId"><option value="TN-BANK" data-i18n="entity.tn">Nexus Bank</option><option value="EU-BANK" data-i18n="entity.eu">Nexus Bank — Europe</option></select></label>
               <label><span data-i18n="lbl.currency">Devise</span><input name="currency" value="TND" maxlength="3" /></label>
               <label><span data-i18n="lbl.amount">Montant</span><input name="amount" value="150000" /></label>
               <label><span data-i18n="pay.purpose">Objet</span><select name="purpose"><option>SUPPLIER</option><option>SALARY</option><option>TAX</option><option>TREASURY_TRANSFER</option><option>INTERCOMPANY</option></select></label>
@@ -258,7 +257,7 @@
           </form>
           <div id="route-result"></div>
           <div class="toolbar">
-            <label><span data-i18n="lbl.entity">Entité</span><select id="remit-entity"><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option><option value="TN-BANK" data-i18n="entity.tn">BIAT</option></select></label>
+            <label><span data-i18n="lbl.entity">Entité</span><select id="remit-entity"><option value="EU-BANK" data-i18n="entity.eu">Nexus Bank — Europe</option><option value="TN-BANK" data-i18n="entity.tn">Nexus Bank</option></select></label>
             <button class="btn primary" id="remit-btn" type="button" data-i18n="btn.remit">Produire la remise</button>
           </div>
           <div id="remit-result"></div>
@@ -324,7 +323,7 @@
             <p class="lead" data-i18n="cash.lead">La position reprend les soldes bancaires du jour et les flux prévus. Elle est distincte de l'élimination intragroupe.</p>
           </div>
           <div class="toolbar">
-            <label><span data-i18n="lbl.entity">Entité</span><select id="cash-entity"><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option><option value="TN-BANK" data-i18n="entity.tn">BIAT</option></select></label>
+            <label><span data-i18n="lbl.entity">Entité</span><select id="cash-entity"><option value="EU-BANK" data-i18n="entity.eu">Nexus Bank — Europe</option><option value="TN-BANK" data-i18n="entity.tn">Nexus Bank</option></select></label>
             <button class="btn primary" id="cash-btn" type="button" data-i18n="btn.cash">Afficher la position</button>
           </div>
           <div id="cash-lines"></div>
@@ -336,7 +335,7 @@
           <div class="page-head">
             <div class="kicker" data-i18n="pay.kicker">Usine de paiements</div>
             <h1 data-i18n="pay.title">Ordres et validation</h1>
-            <p class="lead" data-i18n="pay.lead">Un virement de trésorerie ou intragroupe depuis la BIAT vers une autre entité reste bloqué. Un paiement fournisseur suit les quatre yeux.</p>
+            <p class="lead" data-i18n="pay.lead">Un virement de trésorerie ou intragroupe depuis Nexus Bank Tunisie vers une autre entité reste bloqué. Un paiement fournisseur suit les quatre yeux.</p>
           </div>
           <form class="panel" id="payment-form">
             <div class="row">
@@ -488,17 +487,17 @@
       async function loadPilot() {
         const data = await api("/api/v1/dashboard");
         document.querySelector("#disclaimer").textContent = data.disclaimer;
-        const published = data.published || [];
+        const banks = (await api("/api/v1/counterparties")).filter((party) => party.id.startsWith("CP-BK-"));
         document.querySelector("#kpis").innerHTML = [
           [t("dash.entities"), data.entities.length],
           [t("dash.available"), data.availablePositions],
           [t("dash.pending"), data.pendingDeals],
           [t("dash.validated"), data.validatedDeals],
-          [t("dash.publishedCount"), published.length],
+          [t("dash.banks"), banks.length],
           [t("dash.asof"), data.asOf]
         ].map(([label, value]) => `<div class="stat"><span>${label}</span><strong>${value}</strong></div>`).join("");
-        document.querySelector("#published-kpis").innerHTML = published.map((row) =>
-          `<div class="stat"><span>${row.label}</span><strong>${money(row.amount, row.currency)}</strong></div>`).join("");
+        document.querySelector("#banks-table").innerHTML = table([t("col.entity"), t("col.swift"), t("col.website")], banks.map((bank) =>
+          `<tr><td><strong>${bank.name}</strong></td><td class="mono">${bank.swiftBic || "—"}</td><td>${bank.website || "—"}</td></tr>`));
         document.querySelector("#entity-cards").innerHTML = data.entities.map((entity) =>
           `<article class="card"><span class="badge ok">${entity.jurisdiction}</span><h3>${entity.legalName}</h3><p class="mono">${entity.swiftBic || entity.id}</p><p>${entity.headquarters || ""}</p><p>${entity.registration || ""} ${entity.website ? "· " + entity.website : ""}</p><p>${entity.transferRestricted ? t("restricted") : t("allowed")} · ${entity.reportingCurrency}</p></article>`).join("");
         document.querySelector("#pilot-table").innerHTML = table([t("col.entity"), t("col.jurisdiction"), t("col.currency"), t("col.swift"), t("col.headquarters"), t("col.transfer")], data.entities.map((entity) =>
