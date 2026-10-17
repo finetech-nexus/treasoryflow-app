@@ -1,0 +1,19 @@
+server:
+  port: 8109
+
+spring:
+  application:
+    name: treasoryflow-app
+
+treasoryflow:
+  upstream-url: ${TREASORYFLOW_UPSTREAM_URL:http://localhost:8108}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info
