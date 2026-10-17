@@ -65,7 +65,8 @@
       .panel, .table-wrap { border: 1px solid #e2e8ec; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow-card); }
       .panel { padding: 18px; margin-bottom: 16px; }
       label { display: grid; gap: 7px; color: #73818a; font-size: 10px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
-      input, select { min-width: 140px; min-height: 42px; padding: 10px 12px; border: 1px solid #e2e8eb; border-radius: 12px; background: #fff; }
+      input, select, textarea { min-width: 140px; min-height: 42px; padding: 10px 12px; border: 1px solid #e2e8eb; border-radius: 12px; background: #fff; font: inherit; }
+      textarea { min-width: 320px; }
       .actor-label { min-width: 210px; }
       .actor-label select { min-width: 210px; }
       table { width: 100%; border-collapse: separate; border-spacing: 0; }
@@ -114,6 +115,7 @@
         <button class="nav-link" data-page="groupe" data-area-key="nav.group"><span class="nav-icon">◎</span><span data-i18n="nav.group">Groupe</span></button>
         <button class="nav-link" data-page="regles" data-area-key="nav.rules"><span class="nav-icon">◇</span><span data-i18n="nav.rules">Règles</span></button>
         <div class="nav-group" data-i18n="grp.control">Contrôle</div>
+        <button class="nav-link" data-page="parametrage" data-area-key="nav.platform"><span class="nav-icon">◇</span><span data-i18n="nav.platform">Paramétrage</span></button>
         <button class="nav-link" data-page="integration" data-area-key="nav.integration"><span class="nav-icon">✳</span><span data-i18n="nav.integration">Intégration</span></button>
         <button class="nav-link" data-page="audit" data-area-key="nav.audit"><span class="nav-icon">☰</span><span data-i18n="nav.audit">Audit</span></button>
         <div class="nav-group" data-i18n="grp.help">Aide</div>
@@ -235,7 +237,7 @@
           <div class="page-head">
             <div class="kicker" data-i18n="int.kicker">Intégration</div>
             <h1 data-i18n="int.title">Lots core et rapprochement</h1>
-            <p class="lead" data-i18n="int.lead">Rejouer le même lot ne duplique pas les mouvements. SEPA, TARGET et SWIFT restent inactifs tant que le périmètre ne les exige pas.</p>
+            <p class="lead" data-i18n="int.lead">Le routage lit les seuils et les profils. Une remise produit un message dans le bac à sable, sans émission vers la BCT, SIBTEL, SWIFT ou TARGET.</p>
           </div>
           <div class="toolbar">
             <button class="btn primary" id="import-btn" type="button" data-i18n="btn.import">Importer un lot</button>
@@ -243,7 +245,59 @@
             <button class="btn" id="recon-btn" type="button" data-i18n="btn.recon">Rapprocher le périmètre européen</button>
           </div>
           <div id="import-result"></div>
+          <h2 data-i18n="int.route">Routage</h2>
+          <form class="panel" id="route-form">
+            <div class="row">
+              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId"><option value="TN-BANK" data-i18n="entity.tn">BIAT</option><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option></select></label>
+              <label><span data-i18n="lbl.currency">Devise</span><input name="currency" value="TND" maxlength="3" /></label>
+              <label><span data-i18n="lbl.amount">Montant</span><input name="amount" value="150000" /></label>
+              <label><span data-i18n="pay.purpose">Objet</span><select name="purpose"><option>SUPPLIER</option><option>SALARY</option><option>TAX</option><option>TREASURY_TRANSFER</option><option>INTERCOMPANY</option></select></label>
+              <label><span data-i18n="pay.beneficiaryEntity">Entité bénéficiaire</span><input name="beneficiaryEntityId" placeholder="EU-BANK" /></label>
+              <button class="btn primary" type="submit" data-i18n="btn.route">Router</button>
+            </div>
+          </form>
+          <div id="route-result"></div>
+          <div class="toolbar">
+            <label><span data-i18n="lbl.entity">Entité</span><select id="remit-entity"><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option><option value="TN-BANK" data-i18n="entity.tn">BIAT</option></select></label>
+            <button class="btn primary" id="remit-btn" type="button" data-i18n="btn.remit">Produire la remise</button>
+          </div>
+          <div id="remit-result"></div>
+          <h2 data-i18n="int.statement">Relevé MT940</h2>
+          <form class="panel" id="statement-form">
+            <div class="row">
+              <label><span data-i18n="int.batch">Lot</span><input name="batchId" value="MT940-DEMO" /></label>
+              <label><span data-i18n="int.payload">Relevé</span><textarea name="payload" rows="4">:20:STMT1
+:25:EU-TARGET-EUR
+:60F:C261017EUR4000000,00
+:61:261017C10,00NTRFDEMO61
+:62F:C261017EUR4000010,00</textarea></label>
+              <button class="btn primary" type="submit" data-i18n="btn.statement">Intégrer le relevé</button>
+            </div>
+          </form>
+          <div id="statement-result"></div>
+          <div id="message-table"></div>
           <div id="interfaces"></div>
+        </section>
+
+        <section class="page" id="parametrage">
+          <div class="page-head">
+            <div class="kicker" data-i18n="plt.kicker">Paramétrage</div>
+            <h1 data-i18n="plt.title">Canaux, seuils et profils de paiement</h1>
+            <p class="lead" data-i18n="plt.lead">Le seuil SGMT sépare le RTGS de la télécompensation. Un salaire tunisien reste en SIBTEL. Un virement de trésorerie en dinars part en SGMT.</p>
+          </div>
+          <form class="panel" id="param-form">
+            <div class="row">
+              <label><span data-i18n="plt.code">Paramètre</span><select id="param-code" name="code"></select></label>
+              <label><span data-i18n="plt.value">Valeur</span><input id="param-value" name="value" /></label>
+              <button class="btn primary" type="submit" data-i18n="btn.save">Enregistrer</button>
+            </div>
+          </form>
+          <div id="param-alert"></div>
+          <div id="param-table"></div>
+          <h2 data-i18n="plt.profiles">Profils</h2>
+          <div id="profile-table"></div>
+          <h2 data-i18n="plt.channels">Canaux</h2>
+          <div id="channel-table"></div>
         </section>
 
         <section class="page" id="regles">
@@ -428,6 +482,7 @@
         if (page === "regles") await loadRules();
         if (page === "audit") await loadAudit();
         if (page === "integration") await loadInterfaces();
+        if (page === "parametrage") await loadPlatform();
       }
 
       async function loadPilot() {
@@ -647,7 +702,76 @@
         } catch (error) { showError("#import-result", error); }
       });
 
+      document.querySelector("#route-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const body = Object.fromEntries(new FormData(event.target).entries());
+        if (!body.beneficiaryEntityId) delete body.beneficiaryEntityId;
+        try {
+          const route = await api("/api/v1/connectivity/route", { method: "POST", body });
+          document.querySelector("#route-result").innerHTML = `<div class="stats"><div class="stat"><span>${t("col.interface")}</span><strong>${route.channelCode || "—"}</strong></div><div class="stat"><span>${t("col.format")}</span><strong>${route.format || "—"}</strong></div><div class="stat"><span>${t("col.status")}</span><strong>${route.executable ? t("allowed") : t("restricted")}</strong></div></div><p class="note">${route.reason || ""}</p>`;
+        } catch (error) { showError("#route-result", error); }
+      });
+
+      document.querySelector("#remit-btn").addEventListener("click", async () => {
+        try {
+          const result = await api("/api/v1/connectivity/remit?entityId=" + document.querySelector("#remit-entity").value, { method: "POST" });
+          document.querySelector("#remit-result").innerHTML = `<div class="alert ok">${t("int.generated")} ${result.generated}</div>`;
+          await loadMessages();
+        } catch (error) { showError("#remit-result", error); }
+      });
+
+      document.querySelector("#statement-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const body = Object.fromEntries(new FormData(event.target).entries());
+        try {
+          const result = await api("/api/v1/connectivity/statements", { method: "POST", body });
+          document.querySelector("#statement-result").innerHTML = `<div class="alert ok">${result.status} · ${t("int.accepted")} ${result.accepted}${result.replayed ? " · " + t("int.replayed") : ""}</div>`;
+        } catch (error) { showError("#statement-result", error); }
+      });
+
+      document.querySelector("#param-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const code = document.querySelector("#param-code").value;
+        const value = document.querySelector("#param-value").value;
+        try {
+          await api("/api/v1/platform/parameters/" + code, { method: "POST", body: { value } });
+          document.querySelector("#param-alert").innerHTML = `<div class="alert ok">${code}</div>`;
+          await loadPlatform();
+        } catch (error) { showError("#param-alert", error); }
+      });
+
+      async function loadMessages() {
+        const rows = await api("/api/v1/connectivity/messages");
+        document.querySelector("#message-table").innerHTML = table([t("col.interface"), t("col.format"), t("col.entity"), t("col.reference"), t("col.status")], rows.map((row) =>
+          `<tr><td>${row.channelCode}</td><td class="mono">${row.messageFormat}</td><td>${row.entityId}</td><td class="mono">${row.businessRef}</td><td>${badge(row.status)}</td></tr>`));
+      }
+
+      async function loadPlatform() {
+        const parameters = await api("/api/v1/platform/parameters");
+        const profiles = await api("/api/v1/platform/profiles");
+        const channels = await api("/api/v1/platform/channels");
+        const select = document.querySelector("#param-code");
+        const current = select.value;
+        select.innerHTML = parameters.map((row) => `<option value="${row.code}">${row.code}</option>`).join("");
+        if (current) select.value = current;
+        const selected = parameters.find((row) => row.code === select.value) || parameters[0];
+        if (selected && document.activeElement !== document.querySelector("#param-value")) {
+          document.querySelector("#param-value").value = selected.value;
+        }
+        select.onchange = () => {
+          const row = parameters.find((item) => item.code === select.value);
+          if (row) document.querySelector("#param-value").value = row.value;
+        };
+        document.querySelector("#param-table").innerHTML = table([t("plt.code"), t("plt.value"), t("col.unit"), t("col.detail")], parameters.map((row) =>
+          `<tr><td class="mono">${row.code}</td><td>${row.value}</td><td>${row.unit}</td><td>${row.label}</td></tr>`));
+        document.querySelector("#profile-table").innerHTML = table([t("pay.purpose"), t("col.jurisdiction"), t("col.currency"), t("plt.rule"), t("col.interface")], profiles.map((row) =>
+          `<tr><td>${row.purpose}</td><td>${row.jurisdiction}</td><td>${row.currency}</td><td>${row.rule}</td><td>${row.channelCode || t("plt.byAmount")}</td></tr>`));
+        document.querySelector("#channel-table").innerHTML = table([t("col.interface"), t("col.protocol"), t("col.format"), t("col.currency"), t("plt.floor"), t("plt.cutoff"), t("col.status")], channels.map((row) =>
+          `<tr><td>${row.code}</td><td>${row.protocol}</td><td class="mono">${row.messageFormat}</td><td>${row.currency}</td><td>${row.minAmount || "—"}</td><td>${row.cutoff || "—"}</td><td>${badge(row.status)}</td></tr>`));
+      }
+
       async function loadInterfaces() {
+        await loadMessages();
         const rows = await api("/api/v1/interfaces");
         document.querySelector("#interfaces").innerHTML = table([t("col.interface"), t("col.protocol"), t("col.status"), t("col.activation")], rows.map((row) =>
           `<tr><td>${row.code}</td><td>${row.protocol}</td><td>${badge(row.status)}</td><td>${row.activation}</td></tr>`));

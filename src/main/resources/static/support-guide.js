@@ -95,9 +95,23 @@ window.TF_SUPPORT = {
           "Rapprocher le périmètre européen : le mouvement du deal validé se rattache à sa référence, le mouvement orphelin reste en écart.",
           "Menu Règles. Trois versions publiées : ratio BCT, LCR et NSFR. Chaque ligne porte sa date d'effet et sa référence.",
           "Passez à Nicolas et ouvrez Audit : les événements SEED, IMPORT, calcul et paiement sont visibles. Revenez à Sara : l'audit répond rôle insuffisant.",
-          "Les interfaces SEPA, TARGET, SWIFT et SIBTEL restent inactives. Seul le core banking est actif."
+          "Le core banking est actif. Les rails de paiement se paramètrent dans le menu Paramétrage : ils produisent un message local, sans émission réseau."
         ],
         expect: "Le journal conserve l'acteur, l'action et l'objet. Un rejeu réglementaire ou d'import ne crée pas un second fait."
+      },
+      {
+        title: "9. Paramétrage et rails tunisiens",
+        goal: "Les canaux, les seuils et les profils de paiement sont des données. Les changer change le routage. Les messages restent dans le bac à sable.",
+        steps: [
+          "Menu Paramétrage. Le seuil SGMT_FLOOR_TND vaut 100 000 dinars. En dessous, un fournisseur tunisien part en télécompensation SIBTEL, dénouement J+1, heure limite 12:00. À partir du seuil, il part en SGMT, le RTGS de la BCT, format pacs.008, heure limite 16:30.",
+          "Un salaire, même au-dessus de 100 000 dinars, reste en SIBTEL : le profil PRF-TN-SALARY est fixe. Un virement de trésorerie en dinars, sans sortie du pays, part en SGMT.",
+          "Un fournisseur en euros sur le nostro BIAT part en SWIFT MT103. Un fournisseur européen de 1 000 EUR part en SEPA pain.001. À partir de 1 000 000 EUR, le même objet part en TARGET.",
+          "Menu Intégration, bouton Router : BIAT, 150 000 TND, SUPPLIER. Le canal affiché est SGMT. Recommencez avec 1 000 TND : SIBTEL. Avec INTERCOMPANY vers EU-BANK : aucun canal, motif de non-transférabilité.",
+          "Passez le seuil SGMT à 500, enregistrez, puis routez 1 000 TND : le canal devient SGMT. Remettez 100 000.",
+          "Validez un paiement fournisseur européen avec Karim, puis Produire la remise. Un message pain.001 apparaît, statut GENERATED, mention sandbox-only. Le paiement passe à TRANSMITTED. Une seconde remise n'en crée pas un autre.",
+          "Intégrez le relevé MT940 du compte EU-TARGET-EUR. Le même lot rejoué indique rejoué = oui."
+        ],
+        expect: "Neuf canaux sont visibles, dont SGMT, SIBTEL, SWIFT, SEPA, TARGET, le core et le MT940. CAMT.053 et la comptabilité restent prêts, sans émission externe. Ce n'est pas un raccordement à la BCT."
       }
     ]
   },
@@ -197,9 +211,23 @@ window.TF_SUPPORT = {
           "Reconcile the European scope: the validated deal movement matches its reference, the orphan movement stays a break.",
           "Open Rules. Three published versions: BCT ratio, LCR and NSFR. Each row shows its effective date and reference.",
           "Switch to Nicolas and open Audit: SEED, IMPORT, calculation and payment events are visible. Back to Sara: audit answers insufficient role.",
-          "SEPA, TARGET, SWIFT and SIBTEL stay inactive. Only core banking is active."
+          "Core banking is active. Payment rails are set up under Setup: they produce a local message, with no network send."
         ],
         expect: "The journal keeps the actor, the action and the subject. A regulatory or import replay does not create a second fact."
+      },
+      {
+        title: "9. Setup and Tunisian rails",
+        goal: "Channels, floors and payment profiles are data. Changing them changes routing. Messages stay inside the sandbox.",
+        steps: [
+          "Open Setup. SGMT_FLOOR_TND is 100,000 dinars. Below it, a Tunisian supplier payment goes to SIBTEL clearing, settlement on J+1, cut-off 12:00. From the floor upward it goes to SGMT, the BCT RTGS, format pacs.008, cut-off 16:30.",
+          "A salary, even above 100,000 dinars, stays on SIBTEL: profile PRF-TN-SALARY is fixed. A dinar treasury transfer that does not leave the country goes to SGMT.",
+          "A supplier payment in euros on the BIAT nostro goes out as SWIFT MT103. A European supplier payment of 1,000 EUR goes out as SEPA pain.001. From 1,000,000 EUR the same purpose goes to TARGET.",
+          "Open Integration and click Route: BIAT, 150,000 TND, SUPPLIER. The channel is SGMT. Repeat with 1,000 TND: SIBTEL. With INTERCOMPANY toward EU-BANK: no channel, and the non-transferability reason.",
+          "Set the SGMT floor to 500, save, then route 1,000 TND: the channel becomes SGMT. Put 100,000 back.",
+          "Have Karim validate a European supplier payment, then Build remittance. A pain.001 message appears, status GENERATED, marked sandbox-only. The payment becomes TRANSMITTED. A second remittance does not create another message.",
+          "Import the MT940 statement for account EU-TARGET-EUR. Replaying the same batch reports replayed = yes."
+        ],
+        expect: "Nine channels are listed, including SGMT, SIBTEL, SWIFT, SEPA, TARGET, core banking and MT940. CAMT.053 and accounting stay ready, with no external send. This is not a connection to the BCT."
       }
     ]
   },
@@ -299,9 +327,23 @@ window.TF_SUPPORT = {
           "طابق النطاق الأوروبي: حركة العملية المصادق عليها ترتبط بمرجعها، والحركة اليتيمة تبقى فرقاً.",
           "قائمة القواعد. ثلاث نسخ منشورة: نسبة البنك المركزي و LCR و NSFR. كل سطر يحمل تاريخ السريان والمرجع.",
           "انتقل إلى نيكولا وافتح التدقيق: أحداث SEED و IMPORT والحساب والدفع ظاهرة. عد إلى سارة: التدقيق يجيب دوراً غير كافٍ.",
-          "SEPA و TARGET و SWIFT و SIBTEL تبقى غير مفعلة. النظام المركزي وحده نشط."
+          "النظام المركزي نشط. قنوات الدفع تُضبط في قائمة الإعداد: تنتج رسالة محلية بلا إرسال على الشبكة."
         ],
         expect: "السجل يحفظ المستخدم والفعل والموضوع. إعادة تنظيمية أو إعادة استيراد لا تنشئ واقعة ثانية."
+      },
+      {
+        title: "9. الإعداد وقنوات تونس",
+        goal: "القنوات والعتبات وملفات الدفع بيانات. تغييرها يغيّر التوجيه. الرسائل تبقى في البيئة التجريبية.",
+        steps: [
+          "قائمة الإعداد. عتبة SGMT_FLOOR_TND هي 100 000 دينار. تحتها يذهب دفع مورد تونسي إلى مقاصة SIBTEL، التسوية في اليوم التالي، ساعة القطع 12:00. من العتبة فصاعداً يذهب إلى SGMT، نظام التسوية الإجمالية للبنك المركزي، الصيغة pacs.008، ساعة القطع 16:30.",
+          "الأجر، حتى فوق 100 000 دينار، يبقى في SIBTEL: الملف PRF-TN-SALARY ثابت. تحويل خزينة بالدينار لا يخرج من البلاد يذهب إلى SGMT.",
+          "دفع مورد بالأورو على نوسترو BIAT يخرج SWIFT MT103. دفع مورد أوروبي بـ 1 000 أورو يخرج SEPA pain.001. من 1 000 000 أورو يذهب الغرض نفسه إلى TARGET.",
+          "قائمة الإدماج ثم توجيه: BIAT، 150 000 دينار، SUPPLIER. القناة SGMT. أعد بـ 1 000 دينار: SIBTEL. مع INTERCOMPANY نحو EU-BANK: لا قناة، وسبب عدم قابلية التحويل.",
+          "اجعل عتبة SGMT تساوي 500، احفظ، ثم وجّه 1 000 دينار: القناة تصبح SGMT. أعد 100 000.",
+          "يصادق كريم على دفع مورد أوروبي، ثم إنتاج الإرسالية. تظهر رسالة pain.001 بحالة GENERATED وعبارة sandbox-only. الدفع يصبح TRANSMITTED. إرسالية ثانية لا تنشئ رسالة أخرى.",
+          "أدمج كشف MT940 للحساب EU-TARGET-EUR. إعادة نفس الدفعة تقول معاد = نعم."
+        ],
+        expect: "تسع قنوات ظاهرة، منها SGMT وSIBTEL وSWIFT وSEPA وTARGET والنظام المركزي وMT940. CAMT.053 والمحاسبة جاهزتان بلا إرسال خارجي. هذا ليس ربطاً بالبنك المركزي."
       }
     ]
   }
