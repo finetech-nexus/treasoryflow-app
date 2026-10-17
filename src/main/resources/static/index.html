@@ -6,7 +6,7 @@
     <title>TreasoryFlow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Manrope:wght@700;800&family=Noto+Sans+Arabic:wght@500;700&display=swap" rel="stylesheet" />
     <style>
       :root {
         font-family: Inter, ui-sans-serif, system-ui, sans-serif;
@@ -83,6 +83,14 @@
       .alert { margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: #fff5f5; color: #9a4046; }
       .note { margin: 0 0 12px; color: #75828b; font-size: 13px; line-height: 1.5; }
       .mono { color: #507386; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+      html[lang="ar"] body { font-family: "Noto Sans Arabic", Inter, sans-serif; }
+      .language-tabs { display: flex; gap: 6px; }
+      .chip { padding: 7px 10px; border: 1px solid #e2e8eb; border-radius: 999px; color: #71808a; background: rgba(255,255,255,.85); font-size: 11px; font-weight: 800; }
+      .chip.on { color: #155d52; border-color: #a8e4d7; background: #e3f8f3; }
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 22px; }
+      .card { display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid rgba(226,232,236,.96); border-radius: var(--radius); background: rgba(255,255,255,.91); box-shadow: var(--shadow-card); }
+      .card h3 { margin: 0; color: #20323c; font-size: 16px; }
+      .card p { margin: 0; color: #75828b; font-size: 13px; line-height: 1.55; }
       @media (max-width: 1100px) { .stats { grid-template-columns: 1fr 1fr; } }
       @media (max-width: 900px) { .app-shell { grid-template-columns: 1fr; } .sidebar { position: relative; height: auto; } .workspace { padding: 0 16px 40px; } .workspace-topbar { align-items: flex-start; flex-direction: column; padding: 14px 0; } }
     </style>
@@ -91,33 +99,40 @@
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand"><div class="brand-mark">TF</div><div><small>Nexus Bank</small><strong>TreasoryFlow</strong></div></div>
-        <button class="nav-link active" data-page="pilotage" data-area="Pilotage"><span class="nav-icon">◫</span><span>Pilotage</span></button>
-        <div class="nav-group">Trésorerie</div>
-        <button class="nav-link" data-page="positions" data-area="Positions"><span class="nav-icon">▤</span><span>Positions</span></button>
-        <button class="nav-link" data-page="operations" data-area="Opérations"><span class="nav-icon">⇄</span><span>Opérations</span></button>
-        <button class="nav-link" data-page="previsions" data-area="Prévisions"><span class="nav-icon">↗</span><span>Prévisions</span></button>
-        <div class="nav-group">Réglementaire</div>
-        <button class="nav-link" data-page="calculs" data-area="Calculs"><span class="nav-icon">◈</span><span>Calculs</span></button>
-        <button class="nav-link" data-page="groupe" data-area="Groupe"><span class="nav-icon">◎</span><span>Groupe</span></button>
-        <button class="nav-link" data-page="regles" data-area="Règles"><span class="nav-icon">◇</span><span>Règles</span></button>
-        <div class="nav-group">Contrôle</div>
-        <button class="nav-link" data-page="integration" data-area="Intégration"><span class="nav-icon">✳</span><span>Intégration</span></button>
-        <button class="nav-link" data-page="audit" data-area="Audit"><span class="nav-icon">☰</span><span>Audit</span></button>
+        <button class="nav-link active" data-page="pilotage" data-area-key="nav.dashboard"><span class="nav-icon">◫</span><span data-i18n="nav.dashboard">Tableau de bord</span></button>
+        <div class="nav-group" data-i18n="grp.treasury">Trésorerie</div>
+        <button class="nav-link" data-page="positions" data-area-key="nav.positions"><span class="nav-icon">▤</span><span data-i18n="nav.positions">Positions</span></button>
+        <button class="nav-link" data-page="operations" data-area-key="nav.deals"><span class="nav-icon">⇄</span><span data-i18n="nav.deals">Opérations</span></button>
+        <button class="nav-link" data-page="previsions" data-area-key="nav.forecast"><span class="nav-icon">↗</span><span data-i18n="nav.forecast">Prévisions</span></button>
+        <div class="nav-group" data-i18n="grp.regulatory">Réglementaire</div>
+        <button class="nav-link" data-page="calculs" data-area-key="nav.calc"><span class="nav-icon">◈</span><span data-i18n="nav.calc">Calculs</span></button>
+        <button class="nav-link" data-page="groupe" data-area-key="nav.group"><span class="nav-icon">◎</span><span data-i18n="nav.group">Groupe</span></button>
+        <button class="nav-link" data-page="regles" data-area-key="nav.rules"><span class="nav-icon">◇</span><span data-i18n="nav.rules">Règles</span></button>
+        <div class="nav-group" data-i18n="grp.control">Contrôle</div>
+        <button class="nav-link" data-page="integration" data-area-key="nav.integration"><span class="nav-icon">✳</span><span data-i18n="nav.integration">Intégration</span></button>
+        <button class="nav-link" data-page="audit" data-area-key="nav.audit"><span class="nav-icon">☰</span><span data-i18n="nav.audit">Audit</span></button>
+        <div class="nav-group" data-i18n="grp.help">Aide</div>
+        <button class="nav-link" data-page="support" data-area-key="nav.support"><span class="nav-icon">?</span><span data-i18n="nav.support">Support</span></button>
         <div class="sidebar-foot">
-          <div class="sidebar-note"><strong>Espace trésorerie</strong><span>L'identité est choisie ici et propagée à l'API. Les formules restent dans le moteur versionné.</span></div>
+          <div class="sidebar-note"><strong data-i18n="side.title">Espace trésorerie</strong><span data-i18n="side.body">L'identité est choisie ici et propagée à l'API. Les formules restent dans le moteur versionné.</span></div>
         </div>
       </aside>
       <main class="workspace">
         <div class="workspace-topbar">
-          <div class="breadcrumb"><span>TreasoryFlow</span><span class="breadcrumb-separator">/</span><strong id="crumb-area">Pilotage</strong></div>
+          <div class="breadcrumb"><span>TreasoryFlow</span><span class="breadcrumb-separator">/</span><strong id="crumb-area">Tableau de bord</strong></div>
           <div class="workspace-tools">
-            <span class="workspace-tag">Workspace</span>
-            <label class="actor-label">Acteur
+            <div class="language-tabs">
+              <button class="chip on" type="button" data-lang="fr">FR</button>
+              <button class="chip" type="button" data-lang="en">EN</button>
+              <button class="chip" type="button" data-lang="ar">AR</button>
+            </div>
+            <span class="workspace-tag" data-i18n="workspace">Espace de travail</span>
+            <label class="actor-label"><span data-i18n="actor">Acteur</span>
             <select id="actor">
-              <option value="sara.trader|TREASURER|TN-BANK,EU-BANK">Sara — trésorerie</option>
-              <option value="karim.validator|VALIDATOR|TN-BANK,EU-BANK">Karim — validation</option>
-              <option value="leila.compliance|COMPLIANCE|*">Leila — conformité</option>
-              <option value="nicolas.audit|AUDITOR|*">Nicolas — audit</option>
+              <option value="sara.trader|TREASURER|TN-BANK,EU-BANK" data-i18n="opt.sara">Sara — trésorerie</option>
+              <option value="karim.validator|VALIDATOR|TN-BANK,EU-BANK" data-i18n="opt.karim">Karim — validation</option>
+              <option value="leila.compliance|COMPLIANCE|*" data-i18n="opt.leila">Leila — conformité</option>
+              <option value="nicolas.audit|AUDITOR|*" data-i18n="opt.nicolas">Nicolas — audit</option>
             </select>
           </label>
             <span class="user-avatar" id="avatar">S</span>
@@ -126,38 +141,42 @@
 
         <section class="page on" id="pilotage">
           <div class="page-head">
-            <div class="kicker">Pilotage de trésorerie</div>
-            <h1>Positions et entités du jour</h1>
+            <div class="kicker" data-i18n="dash.kicker">Tableau de bord</div>
+            <h1 data-i18n="dash.title">BIAT et le scénario du jour</h1>
             <p class="lead" id="disclaimer"></p>
           </div>
           <div class="stats" id="kpis"></div>
+          <h2 data-i18n="dash.publishedTitle">États consolidés publiés</h2>
+          <p class="note" data-i18n="dash.publishedLead">Chiffres publics de la BIAT au 31 décembre 2025, en dinars. Ils n'alimentent pas le ratio de liquidité.</p>
+          <div class="stats" id="published-kpis"></div>
+          <div class="cards" id="entity-cards"></div>
           <div id="pilot-table"></div>
         </section>
 
         <section class="page" id="positions">
           <div class="page-head">
-            <div class="kicker">Positions</div>
-            <h1>Soldes par nature</h1>
-            <p class="lead">Les soldes comptabilisés viennent du core. Les positions du TMS sont identifiées par nature. Les conversions conservent le taux, la source et la date dans la consolidation.</p>
+            <div class="kicker" data-i18n="pos.kicker">Positions</div>
+            <h1 data-i18n="pos.title">Soldes par nature</h1>
+            <p class="lead" data-i18n="pos.lead">Les soldes comptabilisés viennent du core. Le scénario de calcul est distinct des états publiés.</p>
           </div>
           <div id="positions-table"></div>
         </section>
 
         <section class="page" id="operations">
           <div class="page-head">
-            <div class="kicker">Opérations</div>
-            <h1>Saisie et validation</h1>
-            <p class="lead">Saisie, soumission et validation à quatre yeux. Une limite de contrepartie peut bloquer la soumission.</p>
+            <div class="kicker" data-i18n="ops.kicker">Opérations</div>
+            <h1 data-i18n="ops.title">Saisie et validation</h1>
+            <p class="lead" data-i18n="ops.lead">Saisie, soumission et validation à quatre yeux. Une limite de contrepartie peut bloquer la soumission.</p>
           </div>
           <form class="panel" id="deal-form">
             <div class="row">
-              <label>Entité<select name="entityId"><option>EU-BANK</option><option>TN-BANK</option></select></label>
-              <label>Produit<select name="productCode"><option>FX_SPOT</option><option>FX_FORWARD</option><option>FX_SWAP</option><option>IB_PLACE</option><option>IB_BORROW</option><option>REPO</option><option>REVERSE_REPO</option></select></label>
-              <label>Devise<input name="currency" value="EUR" maxlength="3" /></label>
-              <label>Montant<input name="amount" value="1000.00" /></label>
-              <label>Contrepartie<select name="counterpartyId" id="counterparties"></select></label>
-              <label>Référence<input name="reference" id="deal-ref" /></label>
-              <button class="btn primary" type="submit" id="submit-deal">Enregistrer et soumettre</button>
+              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId"><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option><option value="TN-BANK" data-i18n="entity.tn">BIAT</option></select></label>
+              <label><span data-i18n="lbl.product">Produit</span><select name="productCode"><option>FX_SPOT</option><option>FX_FORWARD</option><option>FX_SWAP</option><option>IB_PLACE</option><option>IB_BORROW</option><option>REPO</option><option>REVERSE_REPO</option></select></label>
+              <label><span data-i18n="lbl.currency">Devise</span><input name="currency" value="EUR" maxlength="3" /></label>
+              <label><span data-i18n="lbl.amount">Montant</span><input name="amount" value="1000.00" /></label>
+              <label><span data-i18n="lbl.party">Contrepartie</span><select name="counterpartyId" id="counterparties"></select></label>
+              <label><span data-i18n="lbl.reference">Référence</span><input name="reference" id="deal-ref" /></label>
+              <button class="btn primary" type="submit" id="submit-deal" data-i18n="btn.submit">Enregistrer et soumettre</button>
             </div>
           </form>
           <div id="deal-alert"></div>
@@ -166,57 +185,57 @@
 
         <section class="page" id="previsions">
           <div class="page-head">
-            <div class="kicker">Prévisions</div>
-            <h1>Projection et gaps ALM</h1>
+            <div class="kicker" data-i18n="fc.kicker">Prévisions</div>
+            <h1 data-i18n="fc.title">Projection et gaps ALM</h1>
           </div>
           <div class="toolbar">
-            <label>Entité<select id="forecast-entity"><option>EU-BANK</option><option>TN-BANK</option></select></label>
-            <label>Scénario<select id="forecast-scenario"><option>BASE</option><option>STRESS_DELAY</option><option>STRESS_FUNDING</option></select></label>
-            <button class="btn primary" id="project-btn" type="button">Projeter</button>
+            <label><span data-i18n="lbl.entity">Entité</span><select id="forecast-entity"><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option><option value="TN-BANK" data-i18n="entity.tn">BIAT</option></select></label>
+            <label><span data-i18n="lbl.scenario">Scénario</span><select id="forecast-scenario"><option>BASE</option><option>STRESS_DELAY</option><option>STRESS_FUNDING</option></select></label>
+            <button class="btn primary" id="project-btn" type="button" data-i18n="btn.project">Projeter</button>
           </div>
           <div id="forecast-table"></div>
-          <h2>Gaps</h2>
+          <h2 data-i18n="fc.gaps">Gaps</h2>
           <div id="gaps-table"></div>
         </section>
 
         <section class="page" id="calculs">
           <div class="page-head">
-            <div class="kicker">Calculs réglementaires</div>
-            <h1>Exécuter une formule versionnée</h1>
-            <p class="lead">Chaque exécution fige la version de règle, les paramètres et les données sources. Une règle tunisienne n'est pas appliquée à l'entité européenne, ni l'inverse.</p>
+            <div class="kicker" data-i18n="calc.kicker">Calculs réglementaires</div>
+            <h1 data-i18n="calc.title">Exécuter une formule versionnée</h1>
+            <p class="lead" data-i18n="calc.lead">Chaque exécution fige la version de règle, les paramètres et les données sources. Une règle tunisienne n'est pas appliquée à l'entité européenne, ni l'inverse.</p>
           </div>
           <div class="toolbar">
-            <button class="btn primary" id="run-tn" type="button">Ratio tunisien</button>
-            <button class="btn primary" id="run-lcr" type="button">LCR européen</button>
-            <button class="btn primary" id="run-nsfr" type="button">NSFR européen</button>
-            <button class="btn" id="validate-report" type="button">Valider le dernier état</button>
+            <button class="btn primary" id="run-tn" type="button" data-i18n="btn.tn">Ratio tunisien</button>
+            <button class="btn primary" id="run-lcr" type="button" data-i18n="btn.lcr">LCR européen</button>
+            <button class="btn primary" id="run-nsfr" type="button" data-i18n="btn.nsfr">NSFR européen</button>
+            <button class="btn" id="validate-report" type="button" data-i18n="btn.validate">Valider le dernier état</button>
           </div>
           <div id="calc-result"></div>
         </section>
 
         <section class="page" id="groupe">
           <div class="page-head">
-            <div class="kicker">Groupe</div>
-            <h1>Consolidation et financement</h1>
-            <p class="lead">Les flux intragroupe équilibrés sont éliminés. La liquidité tunisienne restreinte n'est pas proposée comme librement transférable.</p>
+            <div class="kicker" data-i18n="grp.kicker">Groupe</div>
+            <h1 data-i18n="grp.title">Consolidation et financement</h1>
+            <p class="lead" data-i18n="grp.lead">Les flux intragroupe équilibrés sont éliminés. La liquidité tunisienne restreinte n'est pas proposée comme librement transférable.</p>
           </div>
           <div class="toolbar">
-            <button class="btn primary" id="consolidate" type="button">Consolider</button>
-            <button class="btn" id="analyse" type="button">Analyser le financement</button>
+            <button class="btn primary" id="consolidate" type="button" data-i18n="btn.consolidate">Consolider</button>
+            <button class="btn" id="analyse" type="button" data-i18n="btn.funding">Analyser le financement</button>
           </div>
           <div id="group-result"></div>
         </section>
 
         <section class="page" id="integration">
           <div class="page-head">
-            <div class="kicker">Intégration</div>
-            <h1>Lots core et rapprochement</h1>
-            <p class="lead">Rejouer le même lot ne duplique pas les mouvements. SEPA, TARGET et SWIFT restent inactifs tant que le périmètre ne les exige pas.</p>
+            <div class="kicker" data-i18n="int.kicker">Intégration</div>
+            <h1 data-i18n="int.title">Lots core et rapprochement</h1>
+            <p class="lead" data-i18n="int.lead">Rejouer le même lot ne duplique pas les mouvements. SEPA, TARGET et SWIFT restent inactifs tant que le périmètre ne les exige pas.</p>
           </div>
           <div class="toolbar">
-            <button class="btn primary" id="import-btn" type="button">Importer un lot</button>
-            <button class="btn" id="replay-btn" type="button">Rejouer le même lot</button>
-            <button class="btn" id="recon-btn" type="button">Rapprocher EU-BANK</button>
+            <button class="btn primary" id="import-btn" type="button" data-i18n="btn.import">Importer un lot</button>
+            <button class="btn" id="replay-btn" type="button" data-i18n="btn.replay">Rejouer le même lot</button>
+            <button class="btn" id="recon-btn" type="button" data-i18n="btn.recon">Rapprocher le périmètre européen</button>
           </div>
           <div id="import-result"></div>
           <div id="interfaces"></div>
@@ -224,8 +243,8 @@
 
         <section class="page" id="regles">
           <div class="page-head">
-            <div class="kicker">Règles</div>
-            <h1>Profils et versions publiées</h1>
+            <div class="kicker" data-i18n="rules.kicker">Règles</div>
+            <h1 data-i18n="rules.title">Profils et versions publiées</h1>
           </div>
           <div id="profiles"></div>
           <div id="rules"></div>
@@ -233,13 +252,28 @@
 
         <section class="page" id="audit">
           <div class="page-head">
-            <div class="kicker">Audit</div>
-            <h1>Journal des actions</h1>
+            <div class="kicker" data-i18n="audit.kicker">Audit</div>
+            <h1 data-i18n="audit.title">Journal des actions</h1>
           </div>
           <div id="audit-table"></div>
         </section>
+
+        <section class="page" id="support">
+          <div class="page-head">
+            <div class="kicker" data-i18n="sup.kicker">Support</div>
+            <h1 data-i18n="sup.title">Tutoriel et exemples</h1>
+            <p class="lead" data-i18n="sup.lead">Quatre parcours sur le jeu chargé : identité BIAT, ratio tunisien, consolidation et import.</p>
+          </div>
+          <div class="cards">
+            <article class="card"><h3 data-i18n="sup.1t">1. Lire le tableau de bord</h3><p data-i18n="sup.1b"></p></article>
+            <article class="card"><h3 data-i18n="sup.2t">2. Calculer le ratio tunisien</h3><p data-i18n="sup.2b"></p></article>
+            <article class="card"><h3 data-i18n="sup.3t">3. Consolider sans transférer la liquidité tunisienne</h3><p data-i18n="sup.3b"></p></article>
+            <article class="card"><h3 data-i18n="sup.4t">4. Rejouer un lot sans le dupliquer</h3><p data-i18n="sup.4b"></p></article>
+          </div>
+        </section>
       </main>
     </div>
+    <script src="i18n.js"></script>
     <script>
       const actorSelect = document.querySelector("#actor");
       const saved = sessionStorage.getItem("tf-actor");
@@ -295,7 +329,7 @@
       }
 
       function table(headers, rows) {
-        return `<div class="table-wrap"><table><thead><tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr></thead><tbody>${rows.join("") || `<tr><td colspan="${headers.length}">Aucune donnée</td></tr>`}</tbody></table></div>`;
+        return `<div class="table-wrap"><table><thead><tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr></thead><tbody>${rows.join("") || `<tr><td colspan="${headers.length}">${t("empty")}</td></tr>`}</tbody></table></div>`;
       }
 
       function showError(target, error) {
@@ -306,7 +340,7 @@
         button.addEventListener("click", () => {
           document.querySelectorAll(".nav-link").forEach((item) => item.classList.remove("active"));
           button.classList.add("active");
-          document.querySelector("#crumb-area").textContent = button.dataset.area;
+          document.querySelector("#crumb-area").textContent = t(button.dataset.areaKey);
           document.querySelectorAll(".page").forEach((page) => page.classList.remove("on"));
           document.querySelector("#" + button.dataset.page).classList.add("on");
           refresh();
@@ -316,7 +350,16 @@
       let lastReportId = null;
       let lastBatch = null;
 
+      document.querySelectorAll("[data-lang]").forEach((button) => {
+        button.addEventListener("click", () => {
+          sessionStorage.setItem("tf-lang", button.dataset.lang);
+          applyI18n();
+          refresh();
+        });
+      });
+
       async function refresh() {
+        applyI18n();
         const page = document.querySelector(".page.on").id;
         if (page === "pilotage") await loadPilot();
         if (page === "positions") await loadPositions();
@@ -330,20 +373,26 @@
       async function loadPilot() {
         const data = await api("/api/v1/dashboard");
         document.querySelector("#disclaimer").textContent = data.disclaimer;
-        const positions = data.positions.filter((position) => position.kind === "AVAILABLE" && !position.intercompanyPairId);
+        const published = data.published || [];
         document.querySelector("#kpis").innerHTML = [
-          ["Entités", data.entities.length],
-          ["Positions disponibles", positions.length],
-          ["Opérations en attente", data.pendingDeals],
-          ["Date de référence", data.asOf]
+          [t("dash.entities"), data.entities.length],
+          [t("dash.available"), data.availablePositions],
+          [t("dash.pending"), data.pendingDeals],
+          [t("dash.validated"), data.validatedDeals],
+          [t("dash.publishedCount"), published.length],
+          [t("dash.asof"), data.asOf]
         ].map(([label, value]) => `<div class="stat"><span>${label}</span><strong>${value}</strong></div>`).join("");
-        document.querySelector("#pilot-table").innerHTML = table(["Entité", "Juridiction", "Devise", "Transfert"], data.entities.map((entity) =>
-          `<tr><td>${entity.id}</td><td>${entity.jurisdiction}</td><td>${entity.reportingCurrency}</td><td>${entity.transferRestricted ? badge("RESTREINT") : badge("AUTORISÉ")}</td></tr>`));
+        document.querySelector("#published-kpis").innerHTML = published.map((row) =>
+          `<div class="stat"><span>${row.label}</span><strong>${money(row.amount, row.currency)}</strong></div>`).join("");
+        document.querySelector("#entity-cards").innerHTML = data.entities.map((entity) =>
+          `<article class="card"><span class="badge ok">${entity.jurisdiction}</span><h3>${entity.legalName}</h3><p class="mono">${entity.swiftBic || entity.id}</p><p>${entity.headquarters || ""}</p><p>${entity.registration || ""} ${entity.website ? "· " + entity.website : ""}</p><p>${entity.transferRestricted ? t("restricted") : t("allowed")} · ${entity.reportingCurrency}</p></article>`).join("");
+        document.querySelector("#pilot-table").innerHTML = table([t("col.entity"), t("col.jurisdiction"), t("col.currency"), t("col.swift"), t("col.headquarters"), t("col.transfer")], data.entities.map((entity) =>
+          `<tr><td><strong>${entity.legalName}</strong></td><td>${entity.jurisdiction}</td><td>${entity.reportingCurrency}</td><td class="mono">${entity.swiftBic || "—"}</td><td>${entity.headquarters || "—"}</td><td>${entity.transferRestricted ? badge(t("restricted")) : badge(t("allowed"))}</td></tr>`));
       }
 
       async function loadPositions() {
         const rows = await api("/api/v1/positions");
-        document.querySelector("#positions-table").innerHTML = table(["Entité", "Compte", "Devise", "Nature", "Montant", "Source", "Paire"], rows.map((row) =>
+        document.querySelector("#positions-table").innerHTML = table([t("col.entity"), t("col.account"), t("col.currency"), t("col.kind"), t("lbl.amount"), t("col.source"), t("col.pair")], rows.map((row) =>
           `<tr><td>${row.entityId}</td><td>${row.accountId}</td><td>${row.currency}</td><td>${badge(row.kind)}</td><td>${money(row.amount, row.currency)}</td><td>${row.sourceSystem}</td><td class="mono">${row.intercompanyPairId || ""}</td></tr>`));
       }
 
@@ -352,8 +401,8 @@
         document.querySelector("#counterparties").innerHTML = parties.map((party) => `<option value="${party.id}">${party.name}</option>`).join("");
         if (!document.querySelector("#deal-ref").value) document.querySelector("#deal-ref").value = "REF-" + Date.now();
         const deals = await api("/api/v1/deals");
-        document.querySelector("#deals-table").innerHTML = table(["Référence", "Entité", "Produit", "Montant", "Statut", "Auteur", ""], deals.map((deal) =>
-          `<tr><td class="mono">${deal.reference}</td><td>${deal.entityId}</td><td>${deal.productCode}</td><td>${money(deal.amount, deal.currency)}</td><td>${badge(deal.status)}</td><td>${deal.createdBy}</td><td>${deal.status === "PENDING_VALIDATION" ? `<button class="btn" data-approve="${deal.id}" type="button">Approuver</button>` : ""}</td></tr>`));
+        document.querySelector("#deals-table").innerHTML = table([t("col.reference"), t("col.entity"), t("col.product"), t("lbl.amount"), t("col.status"), t("col.author"), t("col.action")], deals.map((deal) =>
+          `<tr><td class="mono">${deal.reference}</td><td>${deal.entityId}</td><td>${deal.productCode}</td><td>${money(deal.amount, deal.currency)}</td><td>${badge(deal.status)}</td><td>${deal.createdBy}</td><td>${deal.status === "PENDING_VALIDATION" ? `<button class="btn" data-approve="${deal.id}" type="button">${t("btn.approve")}</button>` : ""}</td></tr>`));
         document.querySelectorAll("[data-approve]").forEach((button) => button.addEventListener("click", async () => {
           try {
             await api("/api/v1/deals/" + button.dataset.approve + "/approve", { method: "POST" });
@@ -374,7 +423,7 @@
         try {
           const created = await api("/api/v1/deals", { method: "POST", body });
           await api("/api/v1/deals/" + created.id + "/submit", { method: "POST" });
-          document.querySelector("#deal-alert").innerHTML = `<p class="note">Opération ${created.reference} soumise.</p>`;
+          document.querySelector("#deal-alert").innerHTML = `<p class="note">${created.reference} — ${t("submitted")}</p>`;
           document.querySelector("#deal-ref").value = "REF-" + Date.now();
           await loadDeals();
         } catch (error) {
@@ -392,10 +441,10 @@
         const scenario = document.querySelector("#forecast-scenario").value;
         const projection = await api("/api/v1/forecasts/project", { method: "POST", body: { entityId, scenario, asOf: "2026-10-17", horizonDays: 10 } });
         const points = projection.points.filter((point) => ["2026-10-17", "2026-10-20", "2026-10-22"].includes(point.date));
-        document.querySelector("#forecast-table").innerHTML = table(["Date", "Devise", "Projeté", "Nature"], points.map((point) =>
+        document.querySelector("#forecast-table").innerHTML = table([t("col.date"), t("col.currency"), t("col.projected"), t("col.nature")], points.map((point) =>
           `<tr><td>${point.date}</td><td>${point.currency}</td><td>${money(point.projected, point.currency)}</td><td>${badge(point.nature)}</td></tr>`));
         const gaps = await api("/api/v1/alm/gaps?entityId=" + entityId);
-        document.querySelector("#gaps-table").innerHTML = table(["Bucket", "Devise", "Actif", "Passif", "Gap"], gaps.map((gap) =>
+        document.querySelector("#gaps-table").innerHTML = table([t("col.bucket"), t("col.currency"), t("col.asset"), t("col.liability"), t("col.gap")], gaps.map((gap) =>
           `<tr><td>${gap.bucket}</td><td>${gap.currency}</td><td>${money(gap.asset)}</td><td>${money(gap.liability)}</td><td>${money(gap.gap, gap.currency)}</td></tr>`));
       }
 
@@ -406,7 +455,7 @@
           const result = await api("/api/v1/regulatory/calculations", { method: "POST", body: { entityId, formulaCode, referenceDate: "2026-10-17" } });
           lastReportId = result.report.id;
           const lines = result.details.filter((detail) => ["NUMERATOR", "DENOMINATOR", "HQLA", "NET_OUTFLOWS", "COHERENCE_CASH_BCT"].includes(detail.component) || detail.side === "CHECK");
-          document.querySelector("#calc-result").innerHTML = `<div class="stats"><div class="stat"><span>${formulaCode}</span><strong>${percent(result.run.result)}</strong></div><div class="stat"><span>Seuil</span><strong>${percent(result.run.threshold)}</strong></div><div class="stat"><span>Version</span><strong>${result.run.ruleVersion}</strong></div><div class="stat"><span>Seuil atteint</span><strong>${result.run.thresholdMet ? "Oui" : "Non"}</strong></div></div><p class="note mono">Empreinte ${result.run.inputSnapshotHash}</p>` + table(["Composante", "Sens", "Montant", "Facteur", "Contribution", "Source"], lines.map((line) =>
+          document.querySelector("#calc-result").innerHTML = `<div class="stats"><div class="stat"><span>${formulaCode}</span><strong>${percent(result.run.result)}</strong></div><div class="stat"><span>${t("col.effect")}</span><strong>${percent(result.run.threshold)}</strong></div><div class="stat"><span>${t("col.version")}</span><strong>${result.run.ruleVersion}</strong></div><div class="stat"><span>${t("col.status")}</span><strong>${result.run.thresholdMet ? t("yes") : t("no")}</strong></div></div><p class="note mono">${result.run.inputSnapshotHash}</p>` + table([t("col.component"), t("col.side"), t("lbl.amount"), t("col.weight"), t("col.contribution"), t("col.explanation")], lines.map((line) =>
             `<tr><td>${line.component}</td><td>${line.side}</td><td>${money(line.amount)}</td><td>${line.weight}</td><td>${money(line.contribution)}</td><td>${line.explanation || ""}</td></tr>`));
         } catch (error) { showError("#calc-result", error); }
       }
@@ -420,23 +469,23 @@
           const report = await api("/api/v1/regulatory/reports/" + lastReportId + "/validate", { method: "POST" });
           const box = document.querySelector("#calc-result");
           box.querySelectorAll(".alert").forEach((node) => node.remove());
-          box.insertAdjacentHTML("afterbegin", `<p class="note">État ${report.status} par ${report.validatedBy}.</p>`);
+          box.insertAdjacentHTML("afterbegin", `<p class="note">${t("reportState")} ${report.status} — ${report.validatedBy}.</p>`);
         } catch (error) { showError("#calc-result", error); }
       });
 
       document.querySelector("#consolidate").addEventListener("click", async () => {
         try {
           const group = await api("/api/v1/group/consolidations?scopeId=GRP-TN-EU&asOf=2026-10-17", { method: "POST" });
-          document.querySelector("#group-result").innerHTML = `<div class="stats"><div class="stat"><span>Consolidé</span><strong>${money(group.consolidatedAmount, group.reportingCurrency)}</strong></div><div class="stat"><span>Éliminé</span><strong>${money(group.eliminatedAmount, group.reportingCurrency)}</strong></div><div class="stat"><span>Transférable</span><strong>${money(group.freelyTransferable, group.reportingCurrency)}</strong></div><div class="stat"><span>Restreint</span><strong>${money(group.restricted, group.reportingCurrency)}</strong></div></div>` + table(["Entité", "Devise", "Origine", "Taux", "Source", "EUR", "Transfert"], group.lines.map((line) =>
-            `<tr><td>${line.entityId}</td><td>${line.originalCurrency}</td><td>${money(line.originalAmount, line.originalCurrency)}</td><td class="mono">${line.rate}</td><td>${line.rateSource}</td><td>${money(line.reportingAmount, "EUR")}</td><td>${line.freelyTransferable ? badge("LIBRE") : badge("BLOQUÉ")}</td></tr>`));
+          document.querySelector("#group-result").innerHTML = `<div class="stats"><div class="stat"><span>${t("nav.group")}</span><strong>${money(group.consolidatedAmount, group.reportingCurrency)}</strong></div><div class="stat"><span>${t("col.pair")}</span><strong>${money(group.eliminatedAmount, group.reportingCurrency)}</strong></div><div class="stat"><span>${t("free")}</span><strong>${money(group.freelyTransferable, group.reportingCurrency)}</strong></div><div class="stat"><span>${t("restricted")}</span><strong>${money(group.restricted, group.reportingCurrency)}</strong></div></div>` + table([t("col.entity"), t("col.currency"), t("lbl.amount"), t("col.rate"), t("col.rateSource"), t("col.eur"), t("col.transfer")], group.lines.map((line) =>
+            `<tr><td>${line.entityId}</td><td>${line.originalCurrency}</td><td>${money(line.originalAmount, line.originalCurrency)}</td><td class="mono">${line.rate}</td><td>${line.rateSource}</td><td>${money(line.reportingAmount, "EUR")}</td><td>${line.freelyTransferable ? badge(t("free")) : badge(t("blocked"))}</td></tr>`));
         } catch (error) { showError("#group-result", error); }
       });
 
       document.querySelector("#analyse").addEventListener("click", async () => {
         try {
           const rows = await api("/api/v1/funding/analyse?scopeId=GRP-TN-EU&asOf=2026-10-17", { method: "POST" });
-          document.querySelector("#group-result").innerHTML = table(["Entité", "Déficit", "Produit", "Source proposée", "Transfert restreint proposé", "Explication"], rows.map((row) =>
-            `<tr><td>${row.entityId}</td><td>${money(row.deficit, row.currency)}</td><td>${row.suggestedProduct}</td><td>${row.proposedSourceEntityId || "—"}</td><td>${row.proposesRestrictedTransfer ? badge("OUI") : badge("NON")}</td><td>${row.explanation}</td></tr>`));
+          document.querySelector("#group-result").innerHTML = table([t("col.entity"), t("col.deficit"), t("col.suggested"), t("col.proposed"), t("col.restricted"), t("col.explanation")], rows.map((row) =>
+            `<tr><td>${row.entityId}</td><td>${money(row.deficit, row.currency)}</td><td>${row.suggestedProduct}</td><td>${row.proposedSourceEntityId || "—"}</td><td>${row.proposesRestrictedTransfer ? badge(t("yes")) : badge(t("no"))}</td><td>${row.explanation}</td></tr>`));
         } catch (error) { showError("#group-result", error); }
       });
 
@@ -470,30 +519,30 @@
       document.querySelector("#recon-btn").addEventListener("click", async () => {
         try {
           const rows = await api("/api/v1/reconciliation/run?entityId=EU-BANK", { method: "POST" });
-          document.querySelector("#import-result").innerHTML = table(["Mouvement", "Montant", "Statut", "Motif"], rows.map((row) =>
+          document.querySelector("#import-result").innerHTML = table([t("col.movement"), t("lbl.amount"), t("col.status"), t("col.reason")], rows.map((row) =>
             `<tr><td class="mono">${row.movementId}</td><td>${money(row.amount, row.currency)}</td><td>${badge(row.status)}</td><td>${row.reason}</td></tr>`));
         } catch (error) { showError("#import-result", error); }
       });
 
       async function loadInterfaces() {
         const rows = await api("/api/v1/interfaces");
-        document.querySelector("#interfaces").innerHTML = table(["Interface", "Protocole", "Statut", "Activation"], rows.map((row) =>
+        document.querySelector("#interfaces").innerHTML = table([t("col.interface"), t("col.protocol"), t("col.status"), t("col.activation")], rows.map((row) =>
           `<tr><td>${row.code}</td><td>${row.protocol}</td><td>${badge(row.status)}</td><td>${row.activation}</td></tr>`));
       }
 
       async function loadRules() {
         const profiles = await api("/api/v1/regulatory/profiles");
         const rules = await api("/api/v1/regulatory/rules");
-        document.querySelector("#profiles").innerHTML = table(["Profil", "Entité", "Juridiction", "Réserve"], profiles.map((profile) =>
+        document.querySelector("#profiles").innerHTML = table([t("col.profile"), t("col.entity"), t("col.jurisdiction"), t("col.reserve")], profiles.map((profile) =>
           `<tr><td>${profile.name}</td><td>${profile.entityId}</td><td>${profile.jurisdiction}</td><td>${profile.disclaimer}</td></tr>`));
-        document.querySelector("#rules").innerHTML = table(["Règle", "Version", "Juridiction", "Formule", "Effet", "Statut", "Référence"], rules.map((rule) =>
+        document.querySelector("#rules").innerHTML = table([t("col.rule"), t("col.version"), t("col.jurisdiction"), t("col.formula"), t("col.effect"), t("col.status"), t("col.regulatory")], rules.map((rule) =>
           `<tr><td>${rule.ruleId}</td><td>${rule.ruleVersion}</td><td>${rule.jurisdiction}</td><td class="mono">${rule.formulaCode}</td><td>${rule.validFrom}</td><td>${badge(rule.approvalStatus)}</td><td>${rule.regulatoryReference}</td></tr>`));
       }
 
       async function loadAudit() {
         try {
           const rows = await api("/api/v1/audit");
-          document.querySelector("#audit-table").innerHTML = table(["Quand", "Acteur", "Action", "Objet", "Détail"], rows.slice(0, 40).map((row) =>
+          document.querySelector("#audit-table").innerHTML = table([t("col.when"), t("col.actor"), t("col.verb"), t("col.subject"), t("col.detail")], rows.slice(0, 40).map((row) =>
             `<tr><td class="mono">${row.occurredAt}</td><td>${row.actor}</td><td>${row.action}</td><td>${row.subjectType}</td><td>${row.detail}</td></tr>`));
         } catch (error) { showError("#audit-table", error); }
       }
