@@ -1,3 +1,52 @@
+const FINERACT_TN_IMPORT = `{
+  "sourceSystem": "FINERACT",
+  "externalBatchId": "FINERACT-TN-BCT-2026-10-17",
+  "balances": [
+    {
+      "externalId": "FIN-JE-BAL-1010-20261017",
+      "entityId": "TN-BANK",
+      "accountId": "TN-BCT-TND",
+      "currency": "TND",
+      "bookedAmount": "512475125.500",
+      "availableAmount": "512475125.500",
+      "asOf": "2026-10-17",
+      "sourceReference": "GL-1010"
+    }
+  ],
+  "movements": [
+    {
+      "externalId": "FIN-JE-88421",
+      "entityId": "TN-BANK",
+      "accountId": "TN-BCT-TND",
+      "currency": "TND",
+      "amount": "-150000.000",
+      "valueDate": "2026-10-17",
+      "bookingDate": "2026-10-17",
+      "reference": "SGMT-FOURN-441"
+    },
+    {
+      "externalId": "FIN-JE-88422",
+      "entityId": "TN-BANK",
+      "accountId": "TN-BCT-TND",
+      "currency": "TND",
+      "amount": "-24875.250",
+      "valueDate": "2026-10-17",
+      "bookingDate": "2026-10-17",
+      "reference": "SIBTEL-SAL-202610"
+    },
+    {
+      "externalId": "FIN-JE-88430",
+      "entityId": "TN-BANK",
+      "accountId": "TN-BCT-TND",
+      "currency": "TND",
+      "amount": "175000.000",
+      "valueDate": "2026-10-17",
+      "bookingDate": "2026-10-17",
+      "reference": "SGMT-ENC-CLIENT-18"
+    }
+  ]
+}`;
+
 window.TF_SUPPORT = {
   fr: {
     lead: "Guide du jeu chargé au 17 octobre 2026. Chaque parcours indique qui agit, ce qu'il faut saisir, et le résultat attendu. La place bancaire est un annuaire, pas le livre de Nexus Bank.",
@@ -112,6 +161,21 @@ window.TF_SUPPORT = {
           "Intégrez le relevé MT940 du compte EU-TARGET-EUR. Le même lot rejoué indique rejoué = oui."
         ],
         expect: "Neuf canaux sont visibles, dont SGMT, SIBTEL, SWIFT, SEPA, TARGET, le core et le MT940. CAMT.053 et la comptabilité restent prêts, sans émission externe. Ce n'est pas un raccordement à la BCT."
+      },
+      {
+        title: "10. Exporter Fineract, importer le lot tunisien",
+        goal: "Fineract exporte le journal. TreasoryFlow importe un lot JSON sur le compte BCT, en dinars, avec trois décimales. Le livre européen ne se mélange pas à ce lot.",
+        steps: [
+          "Export Fineract : GET /fineract-provider/api/v1/journalentries?fromDate=2026-10-17&toDate=2026-10-17&dateFormat=yyyy-MM-dd&locale=en&runningBalance=true&transactionDetails=true, en-tête Fineract-Platform-TenantId. Chaque ligne porte id, transactionId, transactionDate, amount, currency.code, entryType (DEBIT ou CREDIT), glAccountCode, referenceNumber, reversed.",
+          "Ne garder que le compte de caisse BCT dont le code GL est mappé vers TN-BCT-TND, entité TN-BANK, devise TND. Une ligne EUR, ou un bureau du livre européen, ne s'écrit pas sur ce compte.",
+          "Correspondance : externalId = FIN-JE-{id}, stable pour que le rejeu ne double pas. Sur ce compte d'actif, un DEBIT Fineract devient un montant positif (entrée), un CREDIT un montant négatif (sortie). Le solde du jour est organizationRunningBalance, copié en chaîne décimale, pas en flottant. Le dinar a trois décimales (millimes).",
+          "externalBatchId FINERACT-TN-BCT-2026-10-17 est la clé d'idempotence. Le même identifiant et le même contenu répondent rejoué = oui. Le même identifiant avec un autre contenu est refusé.",
+          "Contexte tunisien du fichier : 150 000,000 TND sortent en SGMT (RTGS BCT, pacs.008), car le fournisseur dépasse le seuil SGMT_FLOOR_TND de 100 000 dinars. 24 875,250 TND de salaires restent en télécompensation SIBTEL, dénouement J+1, même si l'on change le seuil : le profil PRF-TN-SALARY est fixe. 175 000,000 TND entrent en SGMT. Rien ne sort du pays.",
+          "Contexte européen, autre lot, autre compte : FINERACT-EU-TARGET-2026-10-17, entité EU-BANK, compte EU-TARGET-EUR, devise EUR à deux décimales. En dessous de 1 000 000 EUR un fournisseur part en SEPA pain.001 ; à partir de ce montant, en TARGET pacs.008. Ce lot ne se poste pas sur TN-BCT-TND. Le dinar n'est pas librement transférable vers l'entité européenne.",
+          "Les règles ne se croisent pas. Le stock de liquidité tunisien se mesure avec la circulaire BCT n° 2014-14. Le livre européen se mesure avec le LCR du CRR, règlement (UE) n° 575/2013, et le règlement délégué (UE) 2015/61. Lancer le LCR sur Nexus Bank, ou le ratio BCT sur le périmètre européen, est refusé."
+        ],
+        example: FINERACT_TN_IMPORT,
+        expect: "Collé dans Intégration puis importé par Sara, le lot passe APPLIED. Le second envoi du même texte indique rejoué = oui et n'ajoute pas les trois mouvements. Le solde BCT de la date asOf est remplacé par 512 475 125,500 TND : ne le jouez que sur un jeu de recette."
       }
     ]
   },
@@ -228,6 +292,21 @@ window.TF_SUPPORT = {
           "Import the MT940 statement for account EU-TARGET-EUR. Replaying the same batch reports replayed = yes."
         ],
         expect: "Nine channels are listed, including SGMT, SIBTEL, SWIFT, SEPA, TARGET, core banking and MT940. CAMT.053 and accounting stay ready, with no external send. This is not a connection to the BCT."
+      },
+      {
+        title: "10. Export from Fineract, import the Tunisian batch",
+        goal: "Fineract exports the journal. TreasoryFlow imports a JSON batch onto the BCT account, in dinars, with three decimal places. The European book is not mixed into this batch.",
+        steps: [
+          "Fineract export: GET /fineract-provider/api/v1/journalentries?fromDate=2026-10-17&toDate=2026-10-17&dateFormat=yyyy-MM-dd&locale=en&runningBalance=true&transactionDetails=true, header Fineract-Platform-TenantId. Each row has id, transactionId, transactionDate, amount, currency.code, entryType (DEBIT or CREDIT), glAccountCode, referenceNumber, reversed.",
+          "Keep only the BCT cash account whose GL code maps to TN-BCT-TND, entity TN-BANK, currency TND. An EUR line, or an office of the European book, is not written on this account.",
+          "Mapping: externalId = FIN-JE-{id}, stable so a replay does not double. On this asset account a Fineract DEBIT becomes a positive amount (inflow) and a CREDIT a negative amount (outflow). The end-of-day balance is organizationRunningBalance, copied as a decimal string, never a float. The dinar has three decimal places (millimes).",
+          "externalBatchId FINERACT-TN-BCT-2026-10-17 is the idempotency key. The same id and the same content return replayed = yes. The same id with different content is rejected.",
+          "Tunisian context of the file: 150,000.000 TND leave through SGMT (BCT RTGS, pacs.008), because the supplier exceeds the SGMT_FLOOR_TND threshold of 100,000 dinars. A salary of 24,875.250 TND stays in SIBTEL clearing, settlement on J+1, even if the threshold changes: profile PRF-TN-SALARY is fixed. 175,000.000 TND come in through SGMT. Nothing leaves the country.",
+          "European context, another batch, another account: FINERACT-EU-TARGET-2026-10-17, entity EU-BANK, account EU-TARGET-EUR, currency EUR with two decimal places. Below 1,000,000 EUR a supplier payment goes out as SEPA pain.001; from that amount, as TARGET pacs.008. That batch is not posted on TN-BCT-TND. The dinar is not freely transferable to the European entity.",
+          "The rules do not cross. Tunisian liquidity stock is measured with BCT circular 2014-14. The European book is measured with the LCR of the CRR, Regulation (EU) No 575/2013, and Delegated Regulation (EU) 2015/61. Running the LCR on Nexus Bank, or the BCT ratio on the European scope, is refused."
+        ],
+        example: FINERACT_TN_IMPORT,
+        expect: "Pasted into Integration and imported by Sara, the batch becomes APPLIED. Sending the same text again reports replayed = yes and does not add the three movements. The BCT balance on asOf is replaced by 512,475,125.500 TND: run it only on a test set."
       }
     ]
   },
@@ -344,6 +423,21 @@ window.TF_SUPPORT = {
           "أدمج كشف MT940 للحساب EU-TARGET-EUR. إعادة نفس الدفعة تقول معاد = نعم."
         ],
         expect: "تسع قنوات ظاهرة، منها SGMT وSIBTEL وSWIFT وSEPA وTARGET والنظام المركزي وMT940. CAMT.053 والمحاسبة جاهزتان بلا إرسال خارجي. هذا ليس ربطاً بالبنك المركزي."
+      },
+      {
+        title: "10. تصدير Fineract واستيراد الدفعة التونسية",
+        goal: "يصدّر Fineract اليومية. يستورد TreasoryFlow دفعة JSON على حساب البنك المركزي، بالدينار، بثلاثة أرقام عشرية. دفتر أوروبا لا يختلط بهذه الدفعة.",
+        steps: [
+          "تصدير Fineract: GET /fineract-provider/api/v1/journalentries?fromDate=2026-10-17&toDate=2026-10-17&dateFormat=yyyy-MM-dd&locale=en&runningBalance=true&transactionDetails=true، والترويسة Fineract-Platform-TenantId. كل سطر يحمل id وtransactionId وtransactionDate وamount وcurrency.code وentryType‏ (DEBIT أو CREDIT) وglAccountCode وreferenceNumber وreversed.",
+          "يُحفظ فقط حساب صندوق البنك المركزي الذي يقابل رمز الأستاذ TN-BCT-TND، الكيان TN-BANK، العملة TND. سطر بالأورو، أو مكتب الدفتر الأوروبي، لا يُكتب على هذا الحساب.",
+          "المقابلة: externalId = FIN-JE-{id}، ثابت حتى لا تُضاعف الإعادة. على حساب الأصل هذا، مدين Fineract يصبح مبلغاً موجباً (دخول) ودائن يصبح سالباً (خروج). رصيد اليوم هو organizationRunningBalance، منسوخاً كسلسلة عشرية لا كعدد عائم. للدينار ثلاثة أرقام (مليمات).",
+          "externalBatchId‏ FINERACT-TN-BCT-2026-10-17 هو مفتاح عدم التكرار. نفس المعرف ونفس المحتوى يجيبان إعادة = نعم. نفس المعرف بمحتوى مختلف يُرفض.",
+          "السياق التونسي للملف: 150 000,000 دينار تخرج عبر SGMT (التسوية الإجمالية للبنك المركزي، pacs.008) لأن المورد يتجاوز عتبة SGMT_FLOOR_TND البالغة 100 000 دينار. راتب 24 875,250 دينار يبقى في مقاصة SIBTEL، التسوية في اليوم التالي، حتى لو تغيرت العتبة: الملف PRF-TN-SALARY ثابت. 175 000,000 دينار تدخل عبر SGMT. لا شيء يخرج من البلاد.",
+          "السياق الأوروبي دفعة أخرى وحساب آخر: FINERACT-EU-TARGET-2026-10-17، الكيان EU-BANK، الحساب EU-TARGET-EUR، العملة EUR برقمين عشريين. تحت 1 000 000 أورو يخرج دفع المورد SEPA pain.001؛ من هذا المبلغ فصاعداً عبر TARGET pacs.008. هذه الدفعة لا تُرحّل على TN-BCT-TND. الدينار غير قابل للتحويل الحر نحو الكيان الأوروبي.",
+          "القواعد لا تتقاطع. مخزون السيولة التونسي يُقاس بمنشور البنك المركزي عدد 2014-14. الدفتر الأوروبي يُقاس بـ LCR وفق CRR، اللائحة (الاتحاد الأوروبي) رقم 575/2013، واللائحة المفوضة (الاتحاد الأوروبي) 2015/61. تشغيل LCR على Nexus Bank، أو نسبة البنك المركزي على النطاق الأوروبي، مرفوض."
+        ],
+        example: FINERACT_TN_IMPORT,
+        expect: "عند لصقها في الإدماج واستيرادها بواسطة سارة تصبح الدفعة APPLIED. إرسال النص نفسه مرة ثانية يقول إعادة = نعم ولا يضيف الحركات الثلاث. رصيد البنك المركزي في تاريخ asOf يُستبدل بـ 512 475 125,500 دينار: لا تشغّلوه إلا على مجموعة اختبار."
       }
     ]
   }
