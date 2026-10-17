@@ -90,7 +90,9 @@
       .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 22px; }
       .card { display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid rgba(226,232,236,.96); border-radius: var(--radius); background: rgba(255,255,255,.91); box-shadow: var(--shadow-card); }
       .card h3 { margin: 0; color: #20323c; font-size: 16px; }
-      .card p { margin: 0; color: #75828b; font-size: 13px; line-height: 1.55; }
+      .card p, .card li { margin: 0; color: #53626c; font-size: 13px; line-height: 1.6; }
+      .card ol { margin: 4px 0 0; padding-inline-start: 18px; display: grid; gap: 6px; }
+      .card .expect { color: #155d52; font-weight: 650; }
       @media (max-width: 1100px) { .stats { grid-template-columns: 1fr 1fr; } }
       @media (max-width: 900px) { .app-shell { grid-template-columns: 1fr; } .sidebar { position: relative; height: auto; } .workspace { padding: 0 16px 40px; } .workspace-topbar { align-items: flex-start; flex-direction: column; padding: 14px 0; } }
     </style>
@@ -104,6 +106,9 @@
         <button class="nav-link" data-page="positions" data-area-key="nav.positions"><span class="nav-icon">▤</span><span data-i18n="nav.positions">Positions</span></button>
         <button class="nav-link" data-page="operations" data-area-key="nav.deals"><span class="nav-icon">⇄</span><span data-i18n="nav.deals">Opérations</span></button>
         <button class="nav-link" data-page="previsions" data-area-key="nav.forecast"><span class="nav-icon">↗</span><span data-i18n="nav.forecast">Prévisions</span></button>
+        <button class="nav-link" data-page="cash" data-area-key="nav.cash"><span class="nav-icon">▤</span><span data-i18n="nav.cash">Position de cash</span></button>
+        <button class="nav-link" data-page="paiements" data-area-key="nav.payments"><span class="nav-icon">⇄</span><span data-i18n="nav.payments">Paiements</span></button>
+        <button class="nav-link" data-page="pooling" data-area-key="nav.pooling"><span class="nav-icon">◎</span><span data-i18n="nav.pooling">Cash pooling</span></button>
         <div class="nav-group" data-i18n="grp.regulatory">Réglementaire</div>
         <button class="nav-link" data-page="calculs" data-area-key="nav.calc"><span class="nav-icon">◈</span><span data-i18n="nav.calc">Calculs</span></button>
         <button class="nav-link" data-page="groupe" data-area-key="nav.group"><span class="nav-icon">◎</span><span data-i18n="nav.group">Groupe</span></button>
@@ -258,22 +263,65 @@
           <div id="audit-table"></div>
         </section>
 
+        <section class="page" id="cash">
+          <div class="page-head">
+            <div class="kicker" data-i18n="cash.kicker">Cash management</div>
+            <h1 data-i18n="cash.title">Position et prévision à 7 jours</h1>
+            <p class="lead" data-i18n="cash.lead">La position reprend les soldes bancaires du jour et les flux prévus. Elle est distincte de l'élimination intragroupe.</p>
+          </div>
+          <div class="toolbar">
+            <label><span data-i18n="lbl.entity">Entité</span><select id="cash-entity"><option value="EU-BANK" data-i18n="entity.eu">Périmètre européen</option><option value="TN-BANK" data-i18n="entity.tn">BIAT</option></select></label>
+            <button class="btn primary" id="cash-btn" type="button" data-i18n="btn.cash">Afficher la position</button>
+          </div>
+          <div id="cash-lines"></div>
+          <h2 data-i18n="cash.horizon">Horizon</h2>
+          <div id="cash-horizon"></div>
+        </section>
+
+        <section class="page" id="paiements">
+          <div class="page-head">
+            <div class="kicker" data-i18n="pay.kicker">Usine de paiements</div>
+            <h1 data-i18n="pay.title">Ordres et validation</h1>
+            <p class="lead" data-i18n="pay.lead">Un virement de trésorerie ou intragroupe depuis la BIAT vers une autre entité reste bloqué. Un paiement fournisseur suit les quatre yeux.</p>
+          </div>
+          <form class="panel" id="payment-form">
+            <div class="row">
+              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId" id="pay-entity"><option value="EU-BANK">EU-BANK</option><option value="TN-BANK">TN-BANK</option></select></label>
+              <label><span data-i18n="pay.account">Compte</span><select name="debitAccountId" id="pay-account"></select></label>
+              <label><span data-i18n="pay.beneficiary">Bénéficiaire</span><input name="beneficiaryName" value="Fournisseur" /></label>
+              <label><span data-i18n="pay.beneficiaryEntity">Entité bénéficiaire</span><input name="beneficiaryEntityId" value="" /></label>
+              <label><span data-i18n="lbl.currency">Devise</span><input name="currency" value="EUR" maxlength="3" /></label>
+              <label><span data-i18n="lbl.amount">Montant</span><input name="amount" value="1000.00" /></label>
+              <label><span data-i18n="pay.purpose">Objet</span><select name="purpose"><option>SUPPLIER</option><option>SALARY</option><option>TAX</option><option>TREASURY_TRANSFER</option><option>INTERCOMPANY</option></select></label>
+              <button class="btn primary" type="submit" data-i18n="btn.submit">Enregistrer et soumettre</button>
+            </div>
+          </form>
+          <div id="payment-alert"></div>
+          <div id="payment-table"></div>
+        </section>
+
+        <section class="page" id="pooling">
+          <div class="page-head">
+            <div class="kicker" data-i18n="pool.kicker">Cash pooling</div>
+            <h1 data-i18n="pool.title">Nivellement physique et pool notionnel</h1>
+            <p class="lead" data-i18n="pool.lead">Le pool physique propose un virement d'excédent vers le compte pivot. Un membre dont la liquidité est restreinte n'est pas nivelé hors de son entité. Le pool notionnel agrège sans virement.</p>
+          </div>
+          <div id="pool-table"></div>
+          <div id="pool-result"></div>
+        </section>
+
         <section class="page" id="support">
           <div class="page-head">
             <div class="kicker" data-i18n="sup.kicker">Support</div>
             <h1 data-i18n="sup.title">Tutoriel et exemples</h1>
-            <p class="lead" data-i18n="sup.lead">Quatre parcours sur le jeu chargé : identité BIAT, ratio tunisien, consolidation et import.</p>
+            <p class="lead" id="support-lead"></p>
           </div>
-          <div class="cards">
-            <article class="card"><h3 data-i18n="sup.1t">1. Lire le tableau de bord</h3><p data-i18n="sup.1b"></p></article>
-            <article class="card"><h3 data-i18n="sup.2t">2. Calculer le ratio tunisien</h3><p data-i18n="sup.2b"></p></article>
-            <article class="card"><h3 data-i18n="sup.3t">3. Consolider sans transférer la liquidité tunisienne</h3><p data-i18n="sup.3b"></p></article>
-            <article class="card"><h3 data-i18n="sup.4t">4. Rejouer un lot sans le dupliquer</h3><p data-i18n="sup.4b"></p></article>
-          </div>
+          <div class="cards" id="support-body"></div>
         </section>
       </main>
     </div>
     <script src="i18n.js"></script>
+    <script src="support-guide.js"></script>
     <script>
       const actorSelect = document.querySelector("#actor");
       const saved = sessionStorage.getItem("tf-actor");
@@ -283,6 +331,15 @@
       }
       actorSelect.addEventListener("change", () => { sessionStorage.setItem("tf-actor", actorSelect.value); paintActor(); refresh(); });
       paintActor();
+
+      window.renderSupport = function () {
+        const guide = (window.TF_SUPPORT && (window.TF_SUPPORT[tfLang()] || window.TF_SUPPORT.fr)) || null;
+        const lead = document.querySelector("#support-lead");
+        const body = document.querySelector("#support-body");
+        if (!guide || !lead || !body) return;
+        lead.textContent = guide.lead;
+        body.innerHTML = guide.chapters.map((chapter) => `<article class="card"><h3>${chapter.title}</h3><p>${chapter.goal}</p><ol>${chapter.steps.map((step) => `<li>${step}</li>`).join("")}</ol><p class="expect">${chapter.expect}</p></article>`).join("");
+      };
 
       function actor() {
         const [id, roles, scope] = actorSelect.value.split("|");
@@ -304,7 +361,7 @@
         const text = await response.text();
         const payload = text ? JSON.parse(text) : null;
         if (!response.ok) {
-          const error = new Error(payload && payload.message ? payload.message : response.statusText);
+          const error = new Error(payload && (payload.message || payload.reason) ? (payload.message || payload.reason) : response.statusText);
           error.status = response.status;
           error.payload = payload;
           throw error;
@@ -365,6 +422,9 @@
         if (page === "positions") await loadPositions();
         if (page === "operations") await loadDeals();
         if (page === "previsions") await loadForecast();
+        if (page === "cash") await loadCash();
+        if (page === "paiements") await loadPayments();
+        if (page === "pooling") await loadPools();
         if (page === "regles") await loadRules();
         if (page === "audit") await loadAudit();
         if (page === "integration") await loadInterfaces();
@@ -449,6 +509,69 @@
       }
 
       document.querySelector("#project-btn").addEventListener("click", () => project().catch((error) => showError("#forecast-table", error)));
+
+      async function loadCash() {
+        const entityId = document.querySelector("#cash-entity").value;
+        const sheet = await api("/api/v1/cash/worksheet?entityId=" + entityId + "&asOf=2026-10-17");
+        document.querySelector("#cash-lines").innerHTML = table([t("col.account"), t("col.currency"), t("cash.booked"), t("cash.available"), t("cash.in"), t("cash.out"), t("cash.projected")], sheet.lines.map((line) =>
+          `<tr><td class="mono">${line.accountId}</td><td>${line.currency}</td><td>${money(line.booked, line.currency)}</td><td>${money(line.available, line.currency)}</td><td>${money(line.inflows, line.currency)}</td><td>${money(line.outflows, line.currency)}</td><td>${money(line.projected, line.currency)}</td></tr>`));
+        document.querySelector("#cash-horizon").innerHTML = table([t("col.date"), t("cash.in"), t("cash.out"), t("cash.closing")], sheet.horizon.map((day) =>
+          `<tr><td>${day.date}</td><td>${money(day.inflow)}</td><td>${money(day.outflow)}</td><td>${money(day.closing)}</td></tr>`));
+      }
+
+      document.querySelector("#cash-btn").addEventListener("click", () => loadCash().catch((error) => showError("#cash-lines", error)));
+
+      const accountsByEntity = { "EU-BANK": ["EU-TARGET-EUR"], "TN-BANK": ["TN-BCT-TND", "TN-NOSTRO-EUR"] };
+      function fillPayAccounts() {
+        const entityId = document.querySelector("#pay-entity").value;
+        document.querySelector("#pay-account").innerHTML = accountsByEntity[entityId].map((id) => `<option>${id}</option>`).join("");
+        document.querySelector("#payment-form [name=currency]").value = entityId === "TN-BANK" && document.querySelector("#pay-account").value === "TN-BCT-TND" ? "TND" : "EUR";
+      }
+      document.querySelector("#pay-entity").addEventListener("change", fillPayAccounts);
+      document.querySelector("#pay-account").addEventListener("change", () => {
+        document.querySelector("#payment-form [name=currency]").value = document.querySelector("#pay-account").value === "TN-BCT-TND" ? "TND" : "EUR";
+      });
+
+      async function loadPayments() {
+        if (!document.querySelector("#pay-account").options.length) fillPayAccounts();
+        const rows = await api("/api/v1/cash/payments");
+        document.querySelector("#payment-table").innerHTML = table([t("col.entity"), t("pay.beneficiary"), t("pay.purpose"), t("lbl.amount"), t("col.status"), t("col.author"), t("col.action")], rows.map((row) =>
+          `<tr><td>${row.entityId}</td><td>${row.beneficiaryName}</td><td>${row.purpose}</td><td>${money(row.amount, row.currency)}</td><td>${badge(row.status)}</td><td>${row.createdBy}</td><td>${row.status === "PENDING_VALIDATION" ? `<button class="btn" data-approve-payment="${row.id}" type="button">${t("btn.approve")}</button>` : ""}</td></tr>`));
+        document.querySelectorAll("[data-approve-payment]").forEach((button) => button.addEventListener("click", async () => {
+          try {
+            await api("/api/v1/cash/payments/" + button.dataset.approvePayment + "/approve", { method: "POST" });
+            document.querySelector("#payment-alert").innerHTML = "";
+            await loadPayments();
+          } catch (error) { showError("#payment-alert", error); }
+        }));
+      }
+
+      document.querySelector("#payment-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const body = Object.fromEntries(new FormData(event.target).entries());
+        try {
+          const created = await api("/api/v1/cash/payments", { method: "POST", body });
+          await api("/api/v1/cash/payments/" + created.id + "/submit", { method: "POST" });
+          document.querySelector("#payment-alert").innerHTML = `<p class="note">${created.id} — ${t("submitted")}</p>`;
+          await loadPayments();
+        } catch (error) {
+          showError("#payment-alert", error);
+          await loadPayments();
+        }
+      });
+
+      async function loadPools() {
+        const pools = await api("/api/v1/cash/pools");
+        document.querySelector("#pool-table").innerHTML = table([t("pool.name"), t("col.currency"), t("pool.type"), t("pool.header"), ""], pools.map((pool) =>
+          `<tr><td>${pool.name}</td><td>${pool.currency}</td><td>${pool.type}</td><td class="mono">${pool.headerAccountId}</td><td><button class="btn" data-sweep="${pool.id}" type="button">${t("btn.sweep")}</button></td></tr>`));
+        document.querySelectorAll("[data-sweep]").forEach((button) => button.addEventListener("click", async () => {
+          try {
+            const sweep = await api("/api/v1/cash/pools/" + button.dataset.sweep + "/sweep?asOf=2026-10-17", { method: "POST" });
+            document.querySelector("#pool-result").innerHTML = `<div class="stats"><div class="stat"><span>${t("pool.executable")}</span><strong>${money(sweep.executableAmount, sweep.currency)}</strong></div><div class="stat"><span>${t("pool.blocked")}</span><strong>${money(sweep.blockedAmount, sweep.currency)}</strong></div></div>` + table([t("col.entity"), t("col.account"), t("cash.available"), t("pool.sweep"), t("col.status"), t("col.reason")], sweep.lines.map((line) =>
+              `<tr><td>${line.entityId}</td><td class="mono">${line.accountId}</td><td>${money(line.available)}</td><td>${money(line.sweepAmount)}</td><td>${line.executable ? badge(t("allowed")) : badge(t("blocked"))}</td><td>${line.reason}</td></tr>`));
+          } catch (error) { showError("#pool-result", error); }
+        }));
+      }
 
       async function calculate(entityId, formulaCode) {
         try {
