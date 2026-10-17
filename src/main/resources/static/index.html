@@ -95,7 +95,11 @@
       .card ol { margin: 4px 0 0; padding-inline-start: 18px; display: grid; gap: 6px; }
       .card .expect { color: #155d52; font-weight: 650; }
       #support-body.cards { grid-template-columns: minmax(0, 920px); }
+      .schema { margin: 4px 0; padding: 10px; border-radius: 14px; background: #f4fbf9; overflow-x: auto; }
+      .schema svg { display: block; width: 100%; height: auto; }
       .example { margin: 0; padding: 12px 14px; border-radius: 12px; background: #12222e; color: #d9fff4; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.5; white-space: pre-wrap; direction: ltr; text-align: left; }
+      #import-form label { display: grid; gap: 8px; width: 100%; }
+      #import-payload { width: 100%; min-height: 280px; }
       @media (max-width: 1100px) { .stats { grid-template-columns: 1fr 1fr; } }
       @media (max-width: 900px) { .app-shell { grid-template-columns: 1fr; } .sidebar { position: relative; height: auto; } .workspace { padding: 0 16px 40px; } .workspace-topbar { align-items: flex-start; flex-direction: column; padding: 14px 0; } }
     </style>
@@ -165,7 +169,7 @@
           <div class="page-head">
             <div class="kicker" data-i18n="pos.kicker">Positions</div>
             <h1 data-i18n="pos.title">Soldes par nature</h1>
-            <p class="lead" data-i18n="pos.lead">Les soldes comptabilisés viennent du core de Nexus Bank.</p>
+            <p class="lead" data-i18n="pos.lead">Aucun solde n'est préchargé. Un lot core ou un relevé MT940 alimente le compte.</p>
           </div>
           <div id="positions-table"></div>
         </section>
@@ -201,6 +205,20 @@
             <label><span data-i18n="lbl.scenario">Scénario</span><select id="forecast-scenario"><option>BASE</option><option>STRESS_DELAY</option><option>STRESS_FUNDING</option></select></label>
             <button class="btn primary" id="project-btn" type="button" data-i18n="btn.project">Projeter</button>
           </div>
+          <form class="panel" id="flow-form">
+            <div class="row">
+              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId" id="flow-entity"><option value="EU-BANK" data-i18n="entity.eu">Nexus Bank — Europe</option><option value="TN-BANK" data-i18n="entity.tn">Nexus Bank</option></select></label>
+              <label><span data-i18n="pay.account">Compte</span><select name="accountId" id="flow-account"></select></label>
+              <label><span data-i18n="lbl.currency">Devise</span><input name="currency" value="EUR" maxlength="3" /></label>
+              <label><span data-i18n="lbl.amount">Montant</span><input name="amount" value="500.00" /></label>
+              <label><span data-i18n="col.date">Date</span><input name="valueDate" value="2026-10-20" /></label>
+              <label><span data-i18n="fc.class">Nature</span><select name="flowClass"><option>ESTIMATED</option><option>CONTRACTUAL</option></select></label>
+              <label><span data-i18n="lbl.scenario">Scénario</span><select name="scenarioCode"><option>BASE</option></select></label>
+              <label><span data-i18n="fc.label">Libellé</span><input name="label" value="Encaissement client" /></label>
+              <button class="btn primary" type="submit" data-i18n="btn.flow">Ajouter le flux</button>
+            </div>
+          </form>
+          <div id="flow-alert"></div>
           <div id="forecast-table"></div>
           <h2 data-i18n="fc.gaps">Gaps</h2>
           <div id="gaps-table"></div>
@@ -210,8 +228,21 @@
           <div class="page-head">
             <div class="kicker" data-i18n="calc.kicker">Calculs réglementaires</div>
             <h1 data-i18n="calc.title">Exécuter une formule versionnée</h1>
-            <p class="lead" data-i18n="calc.lead">Chaque exécution fige la version de règle, les paramètres et les données sources. Une règle tunisienne n'est pas appliquée à l'entité européenne, ni l'inverse.</p>
+            <p class="lead" data-i18n="calc.lead">Chaque exécution fige la version de règle, les paramètres et les données sources. Sans poste saisi, le calcul est refusé. Une règle tunisienne n'est pas appliquée à l'entité européenne, ni l'inverse.</p>
           </div>
+          <form class="panel" id="item-form">
+            <div class="row">
+              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId"><option value="TN-BANK" data-i18n="entity.tn">Nexus Bank</option><option value="EU-BANK" data-i18n="entity.eu">Nexus Bank — Europe</option></select></label>
+              <label><span data-i18n="calc.formula">Formule</span><select name="formulaCode"><option>TN_LIQUIDITY_STOCK</option><option>EU_LCR</option><option>EU_NSFR</option></select></label>
+              <label><span data-i18n="col.side">Sens</span><select name="side"><option>ASSET</option><option>LIABILITY</option><option>HQLA</option><option>OUTFLOW</option><option>INFLOW</option><option>ASF</option><option>RSF</option></select></label>
+              <label><span data-i18n="col.bucket">Poste</span><input name="bucket" value="CASH_BCT" /></label>
+              <label><span data-i18n="lbl.currency">Devise</span><input name="currency" value="TND" maxlength="3" /></label>
+              <label><span data-i18n="lbl.amount">Montant</span><input name="amount" value="1000.00" /></label>
+              <label><span data-i18n="lbl.reference">Référence</span><input name="sourceReference" value="COURS-CASH" /></label>
+              <button class="btn primary" type="submit" data-i18n="btn.item">Ajouter le poste</button>
+            </div>
+          </form>
+          <div id="item-alert"></div>
           <div class="toolbar">
             <button class="btn primary" id="run-tn" type="button" data-i18n="btn.tn">Ratio tunisien</button>
             <button class="btn primary" id="run-lcr" type="button" data-i18n="btn.lcr">LCR européen</button>
@@ -240,6 +271,38 @@
             <h1 data-i18n="int.title">Lots core et rapprochement</h1>
             <p class="lead" data-i18n="int.lead">Le routage lit les seuils et les profils. Une remise produit un message dans le bac à sable, sans émission vers la BCT, SIBTEL, SWIFT ou TARGET.</p>
           </div>
+          <form class="panel" id="import-form">
+            <label><span data-i18n="int.batchFile">Lot à importer</span>
+              <textarea id="import-payload" rows="16">{
+  "sourceSystem": "CORE_BANKING",
+  "externalBatchId": "LOT-COURS-1",
+  "balances": [
+    {
+      "externalId": "SOLDE-BCT",
+      "entityId": "TN-BANK",
+      "accountId": "TN-BCT-TND",
+      "currency": "TND",
+      "bookedAmount": "1000.00",
+      "availableAmount": "1000.00",
+      "asOf": "2026-10-17",
+      "sourceReference": "COURS-BCT"
+    }
+  ],
+  "movements": [
+    {
+      "externalId": "MVT-1",
+      "entityId": "TN-BANK",
+      "accountId": "TN-BCT-TND",
+      "currency": "TND",
+      "amount": "250.00",
+      "valueDate": "2026-10-17",
+      "bookingDate": "2026-10-17",
+      "reference": "VIR-CLIENT"
+    }
+  ]
+}</textarea>
+            </label>
+          </form>
           <div class="toolbar">
             <button class="btn primary" id="import-btn" type="button" data-i18n="btn.import">Importer un lot</button>
             <button class="btn" id="replay-btn" type="button" data-i18n="btn.replay">Rejouer le même lot</button>
@@ -253,7 +316,7 @@
               <label><span data-i18n="lbl.currency">Devise</span><input name="currency" value="TND" maxlength="3" /></label>
               <label><span data-i18n="lbl.amount">Montant</span><input name="amount" value="150000" /></label>
               <label><span data-i18n="pay.purpose">Objet</span><select name="purpose"><option>SUPPLIER</option><option>SALARY</option><option>TAX</option><option>TREASURY_TRANSFER</option><option>INTERCOMPANY</option></select></label>
-              <label><span data-i18n="pay.beneficiaryEntity">Entité bénéficiaire</span><input name="beneficiaryEntityId" placeholder="EU-BANK" /></label>
+              <label><span data-i18n="pay.beneficiaryEntity">Entité bénéficiaire</span><input name="beneficiaryEntityId" placeholder="" /></label>
               <button class="btn primary" type="submit" data-i18n="btn.route">Router</button>
             </div>
           </form>
@@ -267,11 +330,11 @@
           <form class="panel" id="statement-form">
             <div class="row">
               <label><span data-i18n="int.batch">Lot</span><input name="batchId" value="MT940-DEMO" /></label>
-              <label><span data-i18n="int.payload">Relevé</span><textarea name="payload" rows="4">:20:STMT1
+              <label><span data-i18n="int.payload">Relevé</span><textarea name="payload" rows="6">:20:STMT1
 :25:EU-TARGET-EUR
-:60F:C261017EUR4000000,00
-:61:261017C10,00NTRFDEMO61
-:62F:C261017EUR4000010,00</textarea></label>
+:60F:C261017EUR10000,00
+:61:261017C250,00NTRFLOYER
+:62F:C261017EUR10250,00</textarea></label>
               <button class="btn primary" type="submit" data-i18n="btn.statement">Intégrer le relevé</button>
             </div>
           </form>
@@ -341,7 +404,7 @@
           </div>
           <form class="panel" id="payment-form">
             <div class="row">
-              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId" id="pay-entity"><option value="EU-BANK">EU-BANK</option><option value="TN-BANK">TN-BANK</option></select></label>
+              <label><span data-i18n="lbl.entity">Entité</span><select name="entityId" id="pay-entity"><option value="EU-BANK" data-i18n="entity.eu">Nexus Bank — Europe</option><option value="TN-BANK" data-i18n="entity.tn">Nexus Bank</option></select></label>
               <label><span data-i18n="pay.account">Compte</span><select name="debitAccountId" id="pay-account"></select></label>
               <label><span data-i18n="pay.beneficiary">Bénéficiaire</span><input name="beneficiaryName" value="Fournisseur" /></label>
               <label><span data-i18n="pay.beneficiaryEntity">Entité bénéficiaire</span><input name="beneficiaryEntityId" value="" /></label>
@@ -393,9 +456,28 @@
         const body = document.querySelector("#support-body");
         if (!guide || !lead || !body) return;
         lead.textContent = guide.lead;
-        const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
-        body.innerHTML = guide.chapters.map((chapter) => `<article class="card"><h3>${esc(chapter.title)}</h3><p>${esc(chapter.goal)}</p><ol>${chapter.steps.map((step) => `<li>${esc(step)}</li>`).join("")}</ol>${chapter.example ? `<pre class="example">${esc(chapter.example)}</pre>` : ""}<p class="expect">${esc(chapter.expect)}</p></article>`).join("");
+        body.innerHTML = guide.chapters.map((chapter) => `<article class="card"><h3>${esc(chapter.title)}</h3><p>${esc(chapter.goal)}</p>${chapter.schema || ""}<ol>${chapter.steps.map((step) => `<li>${esc(step)}</li>`).join("")}</ol>${chapter.example ? `<pre class="example">${esc(chapter.example)}</pre>` : ""}<p class="expect">${esc(chapter.expect)}</p></article>`).join("");
       };
+
+      function esc(value) {
+        return String(value ?? "").replace(/[&<>]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[char]));
+      }
+
+      function entityName(id) {
+        if (id === "TN-BANK") return t("entity.tn");
+        if (id === "EU-BANK") return t("entity.eu");
+        return id || "—";
+      }
+
+      const accountLabels = {
+        "TN-BCT-TND": "Compte BCT",
+        "TN-NOSTRO-EUR": "Nostro EUR",
+        "EU-TARGET-EUR": "Compte TARGET"
+      };
+
+      function accountLabel(id) {
+        return accountLabels[id] ? `${accountLabels[id]} · ${id}` : (id || "—");
+      }
 
       function actor() {
         const [id, roles, scope] = actorSelect.value.split("|");
@@ -502,7 +584,7 @@
         document.querySelector("#banks-table").innerHTML = table([t("col.entity"), t("col.swift"), t("col.website")], banks.map((bank) =>
           `<tr><td><strong>${bank.name}</strong></td><td class="mono">${bank.swiftBic || "—"}</td><td>${bank.website || "—"}</td></tr>`));
         document.querySelector("#entity-cards").innerHTML = data.entities.map((entity) =>
-          `<article class="card"><span class="badge ok">${entity.jurisdiction}</span><h3>${entity.legalName}</h3><p class="mono">${entity.swiftBic || entity.id}</p><p>${entity.headquarters || ""}</p><p>${entity.registration || ""} ${entity.website ? "· " + entity.website : ""}</p><p>${entity.transferRestricted ? t("restricted") : t("allowed")} · ${entity.reportingCurrency}</p></article>`).join("");
+          `<article class="card"><span class="badge ok">${entity.jurisdiction}</span><h3>${entity.legalName}</h3><p>${entity.headquarters || entity.country}</p><p>${entity.transferRestricted ? t("restricted") : t("allowed")} · ${entity.reportingCurrency}</p></article>`).join("");
         document.querySelector("#pilot-table").innerHTML = table([t("col.entity"), t("col.jurisdiction"), t("col.currency"), t("col.swift"), t("col.headquarters"), t("col.transfer")], data.entities.map((entity) =>
           `<tr><td><strong>${entity.legalName}</strong></td><td>${entity.jurisdiction}</td><td>${entity.reportingCurrency}</td><td class="mono">${entity.swiftBic || "—"}</td><td>${entity.headquarters || "—"}</td><td>${entity.transferRestricted ? badge(t("restricted")) : badge(t("allowed"))}</td></tr>`));
       }
@@ -510,7 +592,7 @@
       async function loadPositions() {
         const rows = await api("/api/v1/positions");
         document.querySelector("#positions-table").innerHTML = table([t("col.entity"), t("col.account"), t("col.currency"), t("col.kind"), t("lbl.amount"), t("col.source"), t("col.pair")], rows.map((row) =>
-          `<tr><td>${row.entityId}</td><td>${row.accountId}</td><td>${row.currency}</td><td>${badge(row.kind)}</td><td>${money(row.amount, row.currency)}</td><td>${row.sourceSystem}</td><td class="mono">${row.intercompanyPairId || ""}</td></tr>`));
+          `<tr><td>${entityName(row.entityId)}</td><td>${accountLabel(row.accountId)}</td><td>${row.currency}</td><td>${badge(row.kind)}</td><td>${money(row.amount, row.currency)}</td><td>${row.sourceSystem}</td><td class="mono">${row.intercompanyPairId || ""}</td></tr>`));
       }
 
       async function loadDeals() {
@@ -519,7 +601,7 @@
         if (!document.querySelector("#deal-ref").value) document.querySelector("#deal-ref").value = "REF-" + Date.now();
         const deals = await api("/api/v1/deals");
         document.querySelector("#deals-table").innerHTML = table([t("col.reference"), t("col.entity"), t("col.product"), t("lbl.amount"), t("col.status"), t("col.author"), t("col.action")], deals.map((deal) =>
-          `<tr><td class="mono">${deal.reference}</td><td>${deal.entityId}</td><td>${deal.productCode}</td><td>${money(deal.amount, deal.currency)}</td><td>${badge(deal.status)}</td><td>${deal.createdBy}</td><td>${deal.status === "PENDING_VALIDATION" ? `<button class="btn" data-approve="${deal.id}" type="button">${t("btn.approve")}</button>` : ""}</td></tr>`));
+          `<tr><td class="mono">${deal.reference}</td><td>${entityName(deal.entityId)}</td><td>${deal.productCode}</td><td>${money(deal.amount, deal.currency)}</td><td>${badge(deal.status)}</td><td>${deal.createdBy}</td><td>${deal.status === "PENDING_VALIDATION" ? `<button class="btn" data-approve="${deal.id}" type="button">${t("btn.approve")}</button>` : ""}</td></tr>`));
         document.querySelectorAll("[data-approve]").forEach((button) => button.addEventListener("click", async () => {
           try {
             await api("/api/v1/deals/" + button.dataset.approve + "/approve", { method: "POST" });
@@ -557,7 +639,7 @@
         const entityId = document.querySelector("#forecast-entity").value;
         const scenario = document.querySelector("#forecast-scenario").value;
         const projection = await api("/api/v1/forecasts/project", { method: "POST", body: { entityId, scenario, asOf: "2026-10-17", horizonDays: 10 } });
-        const points = projection.points.filter((point) => ["2026-10-17", "2026-10-20", "2026-10-22"].includes(point.date));
+        const points = projection.points || [];
         document.querySelector("#forecast-table").innerHTML = table([t("col.date"), t("col.currency"), t("col.projected"), t("col.nature")], points.map((point) =>
           `<tr><td>${point.date}</td><td>${point.currency}</td><td>${money(point.projected, point.currency)}</td><td>${badge(point.nature)}</td></tr>`));
         const gaps = await api("/api/v1/alm/gaps?entityId=" + entityId);
@@ -567,11 +649,43 @@
 
       document.querySelector("#project-btn").addEventListener("click", () => project().catch((error) => showError("#forecast-table", error)));
 
+      function fillFlowAccounts() {
+        const entityId = document.querySelector("#flow-entity").value;
+        const select = document.querySelector("#flow-account");
+        select.innerHTML = accountsByEntity[entityId].map((id) => `<option value="${id}">${accountLabel(id)}</option>`).join("");
+        document.querySelector("#flow-form [name=currency]").value = select.value === "TN-BCT-TND" ? "TND" : "EUR";
+      }
+      document.querySelector("#flow-entity").addEventListener("change", fillFlowAccounts);
+      document.querySelector("#flow-account").addEventListener("change", () => {
+        document.querySelector("#flow-form [name=currency]").value = document.querySelector("#flow-account").value === "TN-BCT-TND" ? "TND" : "EUR";
+      });
+      document.querySelector("#flow-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const body = Object.fromEntries(new FormData(event.target).entries());
+        body.cancellable = false;
+        document.querySelector("#forecast-entity").value = body.entityId;
+        try {
+          await api("/api/v1/forecasts/flows", { method: "POST", body });
+          document.querySelector("#flow-alert").innerHTML = `<p class="note">${body.label} · ${body.amount} ${body.currency}</p>`;
+          await project();
+        } catch (error) { showError("#flow-alert", error); }
+      });
+
+      document.querySelector("#item-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const body = Object.fromEntries(new FormData(event.target).entries());
+        body.asOf = "2026-10-17";
+        try {
+          await api("/api/v1/regulatory/items", { method: "POST", body });
+          document.querySelector("#item-alert").innerHTML = `<p class="note">${body.bucket} · ${body.amount} ${body.currency}</p>`;
+        } catch (error) { showError("#item-alert", error); }
+      });
+
       async function loadCash() {
         const entityId = document.querySelector("#cash-entity").value;
         const sheet = await api("/api/v1/cash/worksheet?entityId=" + entityId + "&asOf=2026-10-17");
         document.querySelector("#cash-lines").innerHTML = table([t("col.account"), t("col.currency"), t("cash.booked"), t("cash.available"), t("cash.in"), t("cash.out"), t("cash.projected")], sheet.lines.map((line) =>
-          `<tr><td class="mono">${line.accountId}</td><td>${line.currency}</td><td>${money(line.booked, line.currency)}</td><td>${money(line.available, line.currency)}</td><td>${money(line.inflows, line.currency)}</td><td>${money(line.outflows, line.currency)}</td><td>${money(line.projected, line.currency)}</td></tr>`));
+          `<tr><td>${accountLabel(line.accountId)}</td><td>${line.currency}</td><td>${money(line.booked, line.currency)}</td><td>${money(line.available, line.currency)}</td><td>${money(line.inflows, line.currency)}</td><td>${money(line.outflows, line.currency)}</td><td>${money(line.projected, line.currency)}</td></tr>`));
         document.querySelector("#cash-horizon").innerHTML = table([t("col.date"), t("cash.in"), t("cash.out"), t("cash.closing")], sheet.horizon.map((day) =>
           `<tr><td>${day.date}</td><td>${money(day.inflow)}</td><td>${money(day.outflow)}</td><td>${money(day.closing)}</td></tr>`));
       }
@@ -579,9 +693,10 @@
       document.querySelector("#cash-btn").addEventListener("click", () => loadCash().catch((error) => showError("#cash-lines", error)));
 
       const accountsByEntity = { "EU-BANK": ["EU-TARGET-EUR"], "TN-BANK": ["TN-BCT-TND", "TN-NOSTRO-EUR"] };
+      fillFlowAccounts();
       function fillPayAccounts() {
         const entityId = document.querySelector("#pay-entity").value;
-        document.querySelector("#pay-account").innerHTML = accountsByEntity[entityId].map((id) => `<option>${id}</option>`).join("");
+        document.querySelector("#pay-account").innerHTML = accountsByEntity[entityId].map((id) => `<option value="${id}">${accountLabel(id)}</option>`).join("");
         document.querySelector("#payment-form [name=currency]").value = entityId === "TN-BANK" && document.querySelector("#pay-account").value === "TN-BCT-TND" ? "TND" : "EUR";
       }
       document.querySelector("#pay-entity").addEventListener("change", fillPayAccounts);
@@ -593,7 +708,7 @@
         if (!document.querySelector("#pay-account").options.length) fillPayAccounts();
         const rows = await api("/api/v1/cash/payments");
         document.querySelector("#payment-table").innerHTML = table([t("col.entity"), t("pay.beneficiary"), t("pay.purpose"), t("lbl.amount"), t("col.status"), t("col.author"), t("col.action")], rows.map((row) =>
-          `<tr><td>${row.entityId}</td><td>${row.beneficiaryName}</td><td>${row.purpose}</td><td>${money(row.amount, row.currency)}</td><td>${badge(row.status)}</td><td>${row.createdBy}</td><td>${row.status === "PENDING_VALIDATION" ? `<button class="btn" data-approve-payment="${row.id}" type="button">${t("btn.approve")}</button>` : ""}</td></tr>`));
+          `<tr><td>${entityName(row.entityId)}</td><td>${row.beneficiaryName}</td><td>${row.purpose}</td><td>${money(row.amount, row.currency)}</td><td>${badge(row.status)}</td><td>${row.createdBy}</td><td>${row.status === "PENDING_VALIDATION" ? `<button class="btn" data-approve-payment="${row.id}" type="button">${t("btn.approve")}</button>` : ""}</td></tr>`));
         document.querySelectorAll("[data-approve-payment]").forEach((button) => button.addEventListener("click", async () => {
           try {
             await api("/api/v1/cash/payments/" + button.dataset.approvePayment + "/approve", { method: "POST" });
@@ -606,6 +721,8 @@
       document.querySelector("#payment-form").addEventListener("submit", async (event) => {
         event.preventDefault();
         const body = Object.fromEntries(new FormData(event.target).entries());
+        body.valueDate = "2026-10-17";
+        if (!body.beneficiaryEntityId) delete body.beneficiaryEntityId;
         try {
           const created = await api("/api/v1/cash/payments", { method: "POST", body });
           await api("/api/v1/cash/payments/" + created.id + "/submit", { method: "POST" });
@@ -625,7 +742,7 @@
           try {
             const sweep = await api("/api/v1/cash/pools/" + button.dataset.sweep + "/sweep?asOf=2026-10-17", { method: "POST" });
             document.querySelector("#pool-result").innerHTML = `<div class="stats"><div class="stat"><span>${t("pool.executable")}</span><strong>${money(sweep.executableAmount, sweep.currency)}</strong></div><div class="stat"><span>${t("pool.blocked")}</span><strong>${money(sweep.blockedAmount, sweep.currency)}</strong></div></div>` + table([t("col.entity"), t("col.account"), t("cash.available"), t("pool.sweep"), t("col.status"), t("col.reason")], sweep.lines.map((line) =>
-              `<tr><td>${line.entityId}</td><td class="mono">${line.accountId}</td><td>${money(line.available)}</td><td>${money(line.sweepAmount)}</td><td>${line.executable ? badge(t("allowed")) : badge(t("blocked"))}</td><td>${line.reason}</td></tr>`));
+              `<tr><td>${entityName(line.entityId)}</td><td>${accountLabel(line.accountId)}</td><td>${money(line.available)}</td><td>${money(line.sweepAmount)}</td><td>${line.executable ? badge(t("allowed")) : badge(t("blocked"))}</td><td>${line.reason}</td></tr>`));
           } catch (error) { showError("#pool-result", error); }
         }));
       }
@@ -657,7 +774,7 @@
         try {
           const group = await api("/api/v1/group/consolidations?scopeId=GRP-TN-EU&asOf=2026-10-17", { method: "POST" });
           document.querySelector("#group-result").innerHTML = `<div class="stats"><div class="stat"><span>${t("nav.group")}</span><strong>${money(group.consolidatedAmount, group.reportingCurrency)}</strong></div><div class="stat"><span>${t("col.pair")}</span><strong>${money(group.eliminatedAmount, group.reportingCurrency)}</strong></div><div class="stat"><span>${t("free")}</span><strong>${money(group.freelyTransferable, group.reportingCurrency)}</strong></div><div class="stat"><span>${t("restricted")}</span><strong>${money(group.restricted, group.reportingCurrency)}</strong></div></div>` + table([t("col.entity"), t("col.currency"), t("lbl.amount"), t("col.rate"), t("col.rateSource"), t("col.eur"), t("col.transfer")], group.lines.map((line) =>
-            `<tr><td>${line.entityId}</td><td>${line.originalCurrency}</td><td>${money(line.originalAmount, line.originalCurrency)}</td><td class="mono">${line.rate}</td><td>${line.rateSource}</td><td>${money(line.reportingAmount, "EUR")}</td><td>${line.freelyTransferable ? badge(t("free")) : badge(t("blocked"))}</td></tr>`));
+            `<tr><td>${entityName(line.entityId)}</td><td>${line.originalCurrency}</td><td>${money(line.originalAmount, line.originalCurrency)}</td><td class="mono">${line.rate}</td><td>${line.rateSource}</td><td>${money(line.reportingAmount, "EUR")}</td><td>${line.freelyTransferable ? badge(t("free")) : badge(t("blocked"))}</td></tr>`));
         } catch (error) { showError("#group-result", error); }
       });
 
@@ -665,23 +782,15 @@
         try {
           const rows = await api("/api/v1/funding/analyse?scopeId=GRP-TN-EU&asOf=2026-10-17", { method: "POST" });
           document.querySelector("#group-result").innerHTML = table([t("col.entity"), t("col.deficit"), t("col.suggested"), t("col.proposed"), t("col.restricted"), t("col.explanation")], rows.map((row) =>
-            `<tr><td>${row.entityId}</td><td>${money(row.deficit, row.currency)}</td><td>${row.suggestedProduct}</td><td>${row.proposedSourceEntityId || "—"}</td><td>${row.proposesRestrictedTransfer ? badge(t("yes")) : badge(t("no"))}</td><td>${row.explanation}</td></tr>`));
+            `<tr><td>${entityName(row.entityId)}</td><td>${money(row.deficit, row.currency)}</td><td>${row.suggestedProduct}</td><td>${entityName(row.proposedSourceEntityId)}</td><td>${row.proposesRestrictedTransfer ? badge(t("yes")) : badge(t("no"))}</td><td>${row.explanation}</td></tr>`));
         } catch (error) { showError("#group-result", error); }
       });
 
       function importBody() {
-        const stamp = lastBatch || ("UI-" + Date.now());
-        lastBatch = stamp;
-        return {
-          sourceSystem: "CORE_BANKING",
-          externalBatchId: stamp,
-          balances: [{ externalId: stamp + "-B", entityId: "TN-BANK", accountId: "TN-BCT-TND", currency: "TND", bookedAmount: "500000000.00", availableAmount: "500000000.00", asOf: "2026-10-17", sourceReference: stamp }],
-          movements: [{ externalId: stamp + "-M", entityId: "TN-BANK", accountId: "TN-BCT-TND", currency: "TND", amount: "25.00", valueDate: "2026-10-17", bookingDate: "2026-10-17", reference: stamp }]
-        };
+        return JSON.parse(document.querySelector("#import-payload").value);
       }
 
       document.querySelector("#import-btn").addEventListener("click", async () => {
-        lastBatch = null;
         try {
           const result = await api("/api/v1/imports/core-banking", { method: "POST", body: importBody() });
           document.querySelector("#import-result").innerHTML = `<p class="note">Lot ${result.id} · ${result.status} · rejoué : ${result.replayed ? "oui" : "non"} · acceptés ${result.accepted}</p>`;
@@ -689,7 +798,6 @@
       });
 
       document.querySelector("#replay-btn").addEventListener("click", async () => {
-        if (!lastBatch) lastBatch = "UI-REPLAY";
         try {
           const result = await api("/api/v1/imports/core-banking", { method: "POST", body: importBody() });
           document.querySelector("#import-result").innerHTML = `<p class="note">Lot ${result.id} · rejoué : ${result.replayed ? "oui" : "non"} · acceptés ${result.accepted}</p>`;
@@ -745,7 +853,7 @@
       async function loadMessages() {
         const rows = await api("/api/v1/connectivity/messages");
         document.querySelector("#message-table").innerHTML = table([t("col.interface"), t("col.format"), t("col.entity"), t("col.reference"), t("col.status")], rows.map((row) =>
-          `<tr><td>${row.channelCode}</td><td class="mono">${row.messageFormat}</td><td>${row.entityId}</td><td class="mono">${row.businessRef}</td><td>${badge(row.status)}</td></tr>`));
+          `<tr><td>${row.channelCode}</td><td class="mono">${row.messageFormat}</td><td>${entityName(row.entityId)}</td><td class="mono">${row.businessRef}</td><td>${badge(row.status)}</td></tr>`));
       }
 
       async function loadPlatform() {
@@ -783,7 +891,7 @@
         const profiles = await api("/api/v1/regulatory/profiles");
         const rules = await api("/api/v1/regulatory/rules");
         document.querySelector("#profiles").innerHTML = table([t("col.profile"), t("col.entity"), t("col.jurisdiction"), t("col.reserve")], profiles.map((profile) =>
-          `<tr><td>${profile.name}</td><td>${profile.entityId}</td><td>${profile.jurisdiction}</td><td>${profile.disclaimer}</td></tr>`));
+          `<tr><td>${profile.name}</td><td>${entityName(profile.entityId)}</td><td>${profile.jurisdiction}</td><td>${profile.disclaimer}</td></tr>`));
         document.querySelector("#rules").innerHTML = table([t("col.rule"), t("col.version"), t("col.jurisdiction"), t("col.formula"), t("col.effect"), t("col.status"), t("col.regulatory")], rules.map((rule) =>
           `<tr><td>${rule.ruleId}</td><td>${rule.ruleVersion}</td><td>${rule.jurisdiction}</td><td class="mono">${rule.formulaCode}</td><td>${rule.validFrom}</td><td>${badge(rule.approvalStatus)}</td><td>${rule.regulatoryReference}</td></tr>`));
       }
